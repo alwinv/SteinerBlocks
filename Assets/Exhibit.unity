@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 952495020}
   - component: {fileID: 952495021}
   - component: {fileID: 952495022}
+  - component: {fileID: 952495023}
   m_Layer: 0
   m_Name: Blocks_Parent
   m_TagString: Untagged
@@ -313,8 +314,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80f2f3ac089adaf489b0157b75205a52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &952495023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 952495019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96aa5b86ddc65404ab7ab3030fbaee1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   spawnManager: {fileID: 746836551}
-  blocksGrid: {fileID: 1866800483}
+  blocks_grid: {fileID: 1866800483}
 --- !u!1 &1622911244
 GameObject:
   m_ObjectHideFlags: 0
