@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 
-public class BlockBehaviors : MonoBehaviour, IFocusable {
+public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
+{
 
     Vector3 originalLocalPosition;
     Vector3 AnimationTargetPosition;
@@ -93,5 +94,47 @@ public class BlockBehaviors : MonoBehaviour, IFocusable {
         AnimationTargetPosition = originalLocalPosition;
         movementSpeed = 0.2f;
         animState = AnimationStates.on;
+    }
+
+    public void OnSelect()
+    {
+        Globals.Instance.SelectedBlock = this.gameObject;
+
+        // move the block up off the matrix plane
+        AnimationTargetPosition = new Vector3(
+            this.transform.localPosition.x,
+            this.transform.localPosition.y + 4 * Globals.BlockSpacing,
+            this.transform.localPosition.z);
+        AnimationTargetScale = new Vector3(
+            originalLocalScale.x * 2,
+            originalLocalScale.y * 2,
+            originalLocalScale.z * 2);
+        animState = AnimationStates.on;
+        movementSpeed = 2f;
+    }
+
+    public void OnUnselect()
+    {
+        Globals.Instance.SelectedBlock = null;
+
+        // move the block back to the original position in the matrix plane
+        AnimationTargetPosition = originalLocalPosition;
+        AnimationTargetScale = originalLocalScale;
+        animState = AnimationStates.on;
+        movementSpeed = 2f;
+    }
+
+    public void OnInputClicked(InputClickedEventData eventData)
+    {
+        if(Globals.Instance.SelectedBlock == this.gameObject)
+        {
+            this.OnUnselect();
+        }
+        else
+        {
+            if(Globals.Instance.SelectedBlock != null)
+                Globals.Instance.SelectedBlock.SendMessage("OnUnselect");
+            this.OnSelect();
+        }
     }
 }

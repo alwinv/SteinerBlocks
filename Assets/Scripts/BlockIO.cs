@@ -49,24 +49,20 @@ public class BlockIO : MonoBehaviour {
 
 #if !UNITY_EDITOR
     private BlockDataList blockDataList;
-    private GameObject[,] blocksGameObjects;
 
     // Handler to load a file 
-    async void OnLoadFile (string fileName)
+    void OnLoadFile (string fileName)
     {
         string blocksJSON;
 
         // read blocks JSON string from file
-        blocksJSON = await LoadBlocksFromFile(fileName);
+        blocksJSON = LoadBlocksFromFile(fileName).Result;
 
         // convert JSON string to blocks data object
         blockDataList = JSONDeserializeBlockDataList(blocksJSON);
 
         // create the block game objects
         loadBlocksFromDataList(blockDataList);
-
-        // rotate the grid up 90deg
-        blocks_grid.transform.Rotate(-90.0f, 0.0f, 0.0f);
     }
 
     private void loadBlocksFromDataList(BlockDataList blocksDataList)
