@@ -46,7 +46,6 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         // initialize the axes transform to be children of the block world
         navStart_axes_transform = new GameObject().transform;
         navStart_axes_transform.SetParent(this.transform.parent);
-
     }
 
     // Update is called once per frame
@@ -59,41 +58,53 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
             // animate rotation
             var stepToRotate = Time.deltaTime * rotationSpeed;
-            var newRotation = Quaternion.RotateTowards(transform.localRotation, AnimationTargetRotation, stepToRotate);
+            this.transform.localRotation = Quaternion.RotateTowards(transform.localRotation, AnimationTargetRotation, stepToRotate);
 
             // animate scale
             var stepToScale = Time.deltaTime * scaleSpeed;
             this.transform.localScale = Vector3.MoveTowards(transform.localScale, AnimationTargetScale, stepToScale);
 
             // turn animation off when it reaches the target
-            if (this.transform.rotation != newRotation)
-            {
-                this.transform.localRotation = newRotation;
-            }
-            else
+            if (this.transform.localRotation == AnimationTargetRotation 
+                && this.transform.localPosition == AnimationTargetPosition
+                && this.transform.localScale == AnimationTargetScale)
             {
                 animState = AnimationStates.off;
             }
         }
     }
 
+    private bool IsNotSelectedBySomeoneElse()
+    {
+        if (this.transform.localPosition.y != (originalLocalPosition.y + 4 * Globals.BlockSpacing))
+            return true;
+        else
+            return false;
+    }
+
     public void OnFocusEnter()
     {
-        // move the block up off the matrix plane
-        AnimationTargetPosition = new Vector3(
-            this.transform.localPosition.x,
-            originalLocalPosition.y + 0.2f * 0.02f,
-            this.transform.localPosition.z);
-        movementSpeed = 2f;
-        animState = AnimationStates.on;
+        if(Globals.Instance.SelectedBlock != this.gameObject && IsNotSelectedBySomeoneElse())
+        {
+            // move the block up off the matrix plane
+            AnimationTargetPosition = new Vector3(
+                this.transform.localPosition.x,
+                originalLocalPosition.y + 0.2f * Globals.BlockSpacing,
+                this.transform.localPosition.z);
+            movementSpeed = 2f;
+            animState = AnimationStates.on;
+        }
     }
 
     public void OnFocusExit()
     {
-        // move the block up back down to the matrix plane
-        AnimationTargetPosition = originalLocalPosition;
-        movementSpeed = 0.2f;
-        animState = AnimationStates.on;
+        if (Globals.Instance.SelectedBlock != this.gameObject && IsNotSelectedBySomeoneElse())
+        {
+            // move the block up back down to the matrix plane
+            AnimationTargetPosition = originalLocalPosition;
+            movementSpeed = 0.2f;
+            animState = AnimationStates.on;
+        }
     }
 
     public void OnSelect()

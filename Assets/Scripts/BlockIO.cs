@@ -70,7 +70,7 @@ public class BlockIO : MonoBehaviour {
         float nOffset = blocksDataList.width / 2; // sets the center of grid the grid to 0
         float mOffset = 0; // sets bottom of grid to 0 (to center grid at 0 instead, use "mRows / 2");
         Quaternion BlockRotation;
-        float blockSpacing = 0.02f;
+        float blockSpacing = Globals.BlockSpacing;
 
         // set blocks up for each column of the grid
         for (int nIndex = 0; nIndex < blocksDataList.width; nIndex++)
