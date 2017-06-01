@@ -210,7 +210,13 @@ PlayerSettings:
     banner: {fileID: 0}
   androidGamepadSupportLevel: 0
   resolutionDialogBanner: {fileID: 0}
-  m_BuildTargetIcons: []
+  m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: cca6c15dd2f83ce428a01083621d9874, type: 3}
+      m_Width: 128
+      m_Height: 128
   m_BuildTargetBatching: []
   m_BuildTargetGraphicsAPIs: []
   m_BuildTargetVRSettings:
@@ -401,8 +407,18 @@ PlayerSettings:
   metroCertificateIssuer: Greenlake Apps
   metroCertificateNotAfter: 804d99adb4e3d301
   metroApplicationDescription: A virtual exhibit of Curtis Steiner's "1000 Blocks"
-  wsaImages: {}
-  metroTileShortName: 
+  wsaImages:
+    65636: Assets/Textures/block_50x50.png
+    65736: Assets/Textures/block_100x100.png
+    65936: Assets/Textures/block_200x200.png
+    2031716: Assets/Textures/block_44x44.png
+    2031816: Assets/Textures/block_88x88.png
+    2097252: Assets/Textures/block_71x71.png
+    2162788: Assets/Textures/block_150x150.png
+    2162888: Assets/Textures/block_300x300.png
+    2228324: Assets/Textures/block_310x310.png
+    2293860: Assets/Textures/Blocks_310x150.png
+  metroTileShortName: Steiner Blocks
   metroCommandLineArgsFile: 
   metroTileShowName: 0
   metroMediumTileShowName: 0
