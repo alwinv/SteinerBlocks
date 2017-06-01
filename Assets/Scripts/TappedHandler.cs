@@ -18,12 +18,9 @@ public class TappedHandler : MonoBehaviour
             if(SharingStage.Instance.Root.InstantiatedPrefabs.GetDataArray().GetLength(0) == 0)
             {
                 // load blocks into the block grid
-                this.SendMessage("OnLoadFile", "ms-appx:///Blocks/1.blocks");
+                this.BroadcastMessage("OnLoadFile_ForSharing", "ms-appx:///Blocks/1.blocks");
             }
             this.recognizer.TappedEvent -= OnTapped;
-        } else
-        {
-
         }
     }
     GestureRecognizer recognizer;

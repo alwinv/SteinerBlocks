@@ -190,6 +190,7 @@ GameObject:
   - component: {fileID: 746836549}
   - component: {fileID: 746836551}
   - component: {fileID: 746836552}
+  - component: {fileID: 746836553}
   m_Layer: 0
   m_Name: Room
   m_TagString: Untagged
@@ -269,6 +270,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6998c1fdd1516d24db3b64a0be78afbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsNavigating: 0
+--- !u!114 &746836553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 746836547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80f2f3ac089adaf489b0157b75205a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &952495019
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,7 +291,6 @@ GameObject:
   m_Component:
   - component: {fileID: 952495020}
   - component: {fileID: 952495021}
-  - component: {fileID: 952495022}
   - component: {fileID: 952495023}
   m_Layer: 0
   m_Name: Blocks_Parent
@@ -315,17 +327,6 @@ MonoBehaviour:
   KeepRoomAlive: 0
   RoomName: DefaultRoom
   AnchorDebugText: {fileID: 1819221217}
---- !u!114 &952495022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 952495019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80f2f3ac089adaf489b0157b75205a52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &952495023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,6 +339,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnManager: {fileID: 746836551}
+  block_prefab: {fileID: 1000013769219478, guid: 8ddf559951f99f549aa1d10eccbf54fb,
+    type: 2}
   blocks_grid: {fileID: 1866800483}
 --- !u!1 &1622911244
 GameObject:

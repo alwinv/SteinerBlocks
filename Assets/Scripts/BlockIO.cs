@@ -17,18 +17,10 @@ using Windows.Storage;
 public class BlockIO : MonoBehaviour {
 
     public PrefabSpawnManager spawnManager;
+    public GameObject block_prefab;
     public GameObject blocks_grid;
 
-    private GridLoadingState loadingState = GridLoadingState.NotStarted;
-
-    // Enum to use when doing grid loading
-    private enum GridLoadingState
-    {
-        NotStarted,
-        Started,
-        FilesRead,
-        Finished
-    }
+    private string[] blocksJSONList;
 
     // Enum to use in re-positioning the grids
     public enum Orientation
@@ -36,14 +28,13 @@ public class BlockIO : MonoBehaviour {
         Vertical,
         Horizontal
     }
-    
+
     // Use this for initialization
     void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 
@@ -51,7 +42,7 @@ public class BlockIO : MonoBehaviour {
     private BlockDataList blockDataList;
 
     // Handler to load a file 
-    void OnLoadFile (string fileName)
+    void OnLoadFile_ForSharing (string fileName)
     {
         string blocksJSON;
 
@@ -62,10 +53,27 @@ public class BlockIO : MonoBehaviour {
         blockDataList = JSONDeserializeBlockDataList(blocksJSON);
 
         // create the block game objects
-        loadBlocksFromDataList(blockDataList);
+        loadBlocksFromDataList(blockDataList, true);
     }
 
-    private void loadBlocksFromDataList(BlockDataList blocksDataList)
+    // Handler to load sample files
+    void OnLoadFiles_ForSlideShow(string[] fileNames)
+    {
+        blocksJSONList = new string[fileNames.Length];
+
+        for (int i = 0; i < fileNames.Length; i++)
+        {
+            // read blocks JSON string from file
+            blocksJSONList[i] = LoadBlocksFromFile(fileNames[i]).Result;
+        }
+
+        // convert JSON string to blocks data object
+
+        // create the block game objects using the first file
+        loadBlocksFromDataList(blockDataList, false);
+    }
+
+    private void loadBlocksFromDataList(BlockDataList blocksDataList, bool SpawnSharedObjects)
     {
         float nOffset = blocksDataList.width / 2; // sets the center of grid the grid to 0
         float mOffset = 0; // sets bottom of grid to 0 (to center grid at 0 instead, use "mRows / 2");
@@ -81,17 +89,30 @@ public class BlockIO : MonoBehaviour {
                 // get rotation from input block grid if it exists
                 BlockRotation = Quaternion.Euler(blocksDataList.BlockData2DArray[nIndex, mIndex].Rotation);
 
-                // instantiate the cube in the right spot on the grid
-                this.spawnManager.Spawn(
-                    new SyncSpawnedObject(),
-                    new Vector3(
-                        (nIndex - nOffset) * blockSpacing,
-                        1 * blockSpacing,
-                        (mIndex - mOffset + 1) * blockSpacing),
-                    BlockRotation,
-                    blocks_grid,
-                    "MyCube",
-                    false);
+                if (SpawnSharedObjects)
+                {
+                    // instantiate a shared cube in the right spot on the grid
+                    this.spawnManager.Spawn(
+                        new SyncSpawnedObject(),
+                        new Vector3(
+                            (nIndex - nOffset) * Globals.BlockSpacing,
+                            1 * blockSpacing,
+                            (mIndex - mOffset + 1) * Globals.BlockSpacing),
+                        BlockRotation,
+                        blocks_grid,
+                        "MyCube",
+                        false);
+                }
+                else
+                {
+                    // instantiate a local cube in the right spot on the grid
+                    GameObject NewBlock = Instantiate(block_prefab, blocks_grid.transform, false);
+                    NewBlock.transform.localRotation = BlockRotation;
+                    NewBlock.transform.localPosition = new Vector3(
+                            (nIndex - nOffset) * Globals.BlockSpacing,
+                            1 * Globals.BlockSpacing,
+                            (mIndex - mOffset + 1) * Globals.BlockSpacing);
+                }
             }
         }
     }
@@ -253,8 +274,8 @@ public class BlockIO : MonoBehaviour {
         try
         {
             Uri fileURI = new Uri(fileName);
-            StorageFile blocksFile = await StorageFile.GetFileFromApplicationUriAsync(fileURI);//.AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
-            return await FileIO.ReadTextAsync(blocksFile);//.AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+            StorageFile blocksFile = await StorageFile.GetFileFromApplicationUriAsync(fileURI);
+            return await FileIO.ReadTextAsync(blocksFile);
         }
         catch (Exception ex)
         {
