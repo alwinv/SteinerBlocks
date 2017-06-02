@@ -31,6 +31,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     float scaleSpeed = 100f;
     float rotationSpeed = 360;
 
+    Vector3 currentlyNavigatingDirection;
 
     // Use this for initialization
     void Start () {
@@ -84,7 +85,9 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
     public void OnFocusEnter()
     {
-        if(Globals.Instance.SelectedBlock != this.gameObject && IsNotSelectedBySomeoneElse())
+        if(!Globals.CurrentlyNavigating 
+            && Globals.Instance.SelectedBlock != this.gameObject 
+            && IsNotSelectedBySomeoneElse())
         {
             // move the block up off the matrix plane
             AnimationTargetPosition = new Vector3(
@@ -98,7 +101,9 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
     public void OnFocusExit()
     {
-        if (Globals.Instance.SelectedBlock != this.gameObject && IsNotSelectedBySomeoneElse())
+        if (!Globals.CurrentlyNavigating
+            && Globals.Instance.SelectedBlock != this.gameObject 
+            && IsNotSelectedBySomeoneElse())
         {
             // move the block up back down to the matrix plane
             AnimationTargetPosition = originalLocalPosition;
@@ -148,4 +153,104 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
             this.OnSelect();
         }
     }
+
+    #region navigation
+    //
+    // handlers for navigation 
+    //
+
+    void OnRotateRelativeInit(Vector3 navDirection)
+    {
+        // calculate and store transform for "front" of block relative to user's head position
+        initFrontFace_transform();
+    }
+
+    void initFrontFace_transform()
+    {
+        // initialize the frame of reference for the rotations 
+        // (e.g. how does up/down/etc navigation translate to block rotation)
+        navStart_headPosition = Camera.main.transform.position;
+        navStart_gazeRotation = Camera.main.transform.rotation;
+
+        // clone the camera, as a child of the block world transform
+        var tempTransform = new GameObject().transform;
+        tempTransform.SetParent(this.transform.parent);
+        tempTransform.rotation = navStart_gazeRotation;
+        tempTransform.position = navStart_headPosition;
+
+        //// rotate cloned camera to look at the selected block
+        tempTransform.LookAt(this.transform, Camera.main.transform.up);
+
+        // find closest 90 deg local rotation angles for the cloned camera 
+        Vector3 SnapAngles;
+        SnapAngles.x = Mathf.RoundToInt(tempTransform.localEulerAngles.x / 90) * 90;
+        SnapAngles.y = Mathf.RoundToInt(tempTransform.localEulerAngles.y / 90) * 90;
+        SnapAngles.z = Mathf.RoundToInt(tempTransform.localEulerAngles.z / 90) * 90;
+
+        // rotate the transform to the nearest 90 deg snap angles
+        tempTransform.localEulerAngles = SnapAngles;
+
+        // save off the resulting transform which defines the up, right, forward 
+        // directions to use in block rotation navigation
+        navStart_axes_transform.rotation = tempTransform.rotation;
+        navStart_axes_transform.position = tempTransform.position;
+
+        // save off the current block's starting rotation
+        // to use in absolute rotations
+        navStart_block_rotation = this.transform.rotation;
+    }
+
+    void OnRotateRelative(Vector3 relativeAmount)
+    {
+        rotateRelative(relativeAmount);
+    }
+
+    void OnRotateRelativeSnap(Vector3 relativeAmount)
+    {
+        // find closest 90 deg local rotation angles for this block
+        Vector3 SnapAngles = new Vector3(0, 0, 0);
+        SnapAngles.x = Mathf.RoundToInt(this.transform.localEulerAngles.x / 90) * 90;
+        SnapAngles.y = Mathf.RoundToInt(this.transform.localEulerAngles.y / 90) * 90;
+        SnapAngles.z = Mathf.RoundToInt(this.transform.localEulerAngles.z / 90) * 90;
+
+        // save the quaternion for animations
+        this.AnimationTargetRotation.eulerAngles = SnapAngles;
+        animState = AnimationStates.on;
+    }
+
+    void rotateRelative(Vector3 relativeAmount)
+    {
+        animState = AnimationStates.off;
+        // rotate the cube around the world x, y and z axes
+        // amount to rotate is based on the relative amount vector against the original rotation of the block
+        // x,y,z navitagion is scaled to rotations by NavigationToRotationFactor
+        // x,y,z navigation is constrained to 1 axis
+
+        this.transform.rotation = navStart_block_rotation;
+        if (Mathf.Abs(relativeAmount.y) > 0)
+        {
+            this.transform.Rotate(
+                navStart_axes_transform.right,
+                relativeAmount.y * Globals.NavigationToRotationFactor,
+                Space.World);
+        }
+        if (Mathf.Abs(relativeAmount.x) > 0)
+        {
+            this.transform.Rotate(
+                navStart_axes_transform.up,
+                relativeAmount.x * Globals.NavigationToRotationFactor,
+                Space.World);
+        }
+        if (Mathf.Abs(relativeAmount.z) > 0)
+        {
+            this.transform.Rotate(
+                navStart_axes_transform.forward,
+                -relativeAmount.z * Globals.NavigationToRotationFactor,
+                Space.World);
+        }
+
+    }
+
+    #endregion
+
 }

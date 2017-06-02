@@ -68,6 +68,7 @@ public class BlockIO : MonoBehaviour {
         }
 
         // convert JSON string to blocks data object
+        blockDataList = JSONDeserializeBlockDataList(blocksJSONList[3]);
 
         // create the block game objects using the first file
         loadBlocksFromDataList(blockDataList, false);
