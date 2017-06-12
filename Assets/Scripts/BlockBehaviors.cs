@@ -147,7 +147,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         movementSpeed = 2f;
 
         // update file
-        this.SendMessageUpwards("OnSaveFile_ForSharing");
+        this.SendMessageUpwards("OnSaveFile_ForLocal");
 
         // hide selection highlight
         Globals.Instance.SelectionHighlight.SendMessage("OnUnSelect");
