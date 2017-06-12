@@ -54,7 +54,7 @@ public class BlockIO : MonoBehaviour {
         createBlocksFromFile(fileName, true);
     }
 
-    void OnSaveFile_ForSharing()
+    void OnSaveFile_ForLocal()
     {
         // get all the objects
         Transform blocks_grid = this.transform.GetChild(0);
@@ -64,10 +64,12 @@ public class BlockIO : MonoBehaviour {
         name = name.Substring(0, name.IndexOf("_"));
 
         // detect how many blocks wide and high the grid is
-        int width = Mathf.FloorToInt((blocks_grid.GetChild(blocks_grid.childCount -1).localPosition.x 
-            - blocks_grid.GetChild(0).localPosition.x)/Globals.BlockSpacing);
-        int height = Mathf.FloorToInt((blocks_grid.GetChild(blocks_grid.childCount - 1).localPosition.y
-            - blocks_grid.GetChild(0).localPosition.y) / Globals.BlockSpacing);
+        // todo: 1000 should be replaced by blocks_grid.ChildCount to support arbitrary grid sizes
+        // todo: but there are 2x the expected children in the grids somehow, so it's failing
+        int width = Mathf.FloorToInt((blocks_grid.GetChild(1000 -1).localPosition.x 
+            - blocks_grid.GetChild(0).localPosition.x)/Globals.BlockSpacing) + 1;
+        int height = Mathf.FloorToInt((blocks_grid.GetChild(1000 - 1).localPosition.z
+            - blocks_grid.GetChild(0).localPosition.z) / Globals.BlockSpacing) + 1;
 
         // create a 2D grid to place the GameObjects in
         GameObject[,] blocksGameObjectList2D = new GameObject[width, height];
@@ -160,7 +162,7 @@ public class BlockIO : MonoBehaviour {
         BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
 
         // rotate all the SlideShow's blocks to the new orientation
-        for(int i = 0; i < this.transform.GetChild(0).childCount; i++)
+        for(int i = 0; i < blocksList.BlockDataArray.Length; i++)
         {
             // note: starting at i=1 and indexing using i-1 because the blocks_grid transform itself is included
             this.transform.GetChild(0).GetChild(i).gameObject.SendMessage("OnRotateAbsolute", Quaternion.Euler(blocksList.BlockDataArray[i].Rotation));
