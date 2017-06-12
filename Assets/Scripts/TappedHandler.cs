@@ -23,6 +23,13 @@ public class TappedHandler : MonoBehaviour
         this.recognizer.NavigationCanceledEvent += Recognizer_NavigationCanceledEvent;
         this.recognizer.NavigationCompletedEvent += Recognizer_NavigationCompletedEvent;
         this.recognizer.StartCapturingGestures();
+
+        SharingStage.Instance.SharingManagerConnected += Instance_SharingManagerConnected;
+    }
+
+    private void Instance_SharingManagerConnected(object sender, System.EventArgs e)
+    {
+        throw new System.NotImplementedException();
     }
 
     private void Recognizer_NavigationStartedEvent(InteractionSourceKind source, Vector3 normalizedOffset, Ray headRay)
@@ -101,7 +108,6 @@ public class TappedHandler : MonoBehaviour
         }
     }
 
-
     void EndNavigation(Vector3 relativePosition)
     {
         Globals.CurrentlyNavigating = false;
@@ -117,12 +123,14 @@ public class TappedHandler : MonoBehaviour
         // If we're networking...
         if (SharingStage.Instance.IsConnected)
         {
+            // if there are no shared blocks yet, create them
             if(SharingStage.Instance.Root.InstantiatedPrefabs.GetDataArray().GetLength(0) == 0)
             {
                 // load blocks into the block grid
-                sharedBlocks_Grid.SendMessage("OnLoadFile_ForSharing", "ms-appx:///Blocks/1.blocks");
+                sharedBlocks_Grid.SendMessage("OnLoadFile_ForSharing", "1.blocks");
             }
             this.recognizer.TappedEvent -= OnTapped;
         }
     }
+
 }

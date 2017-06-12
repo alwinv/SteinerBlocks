@@ -21,6 +21,7 @@ public class BlockIO : MonoBehaviour {
     public GameObject blocks_grid;
 
     private string[] blocksJSONList;
+    private int blocks_SideShow_CurrentListItem = 0;
 
     // Enum to use in re-positioning the grids
     public enum Orientation
@@ -39,21 +40,94 @@ public class BlockIO : MonoBehaviour {
 	}
 
 #if !UNITY_EDITOR
-    private BlockDataList blockDataList;
 
+    // Handler to load a local file
     // Handler to load a file 
+    void OnLoadFile_ForLocal(string fileName)
+    {
+        createBlocksFromFile(fileName, false);
+    }
+
+    // Handler to load a shared file 
     void OnLoadFile_ForSharing (string fileName)
     {
-        string blocksJSON;
+        createBlocksFromFile(fileName, true);
+    }
 
-        // read blocks JSON string from file
-        blocksJSON = LoadBlocksFromFile(fileName).Result;
+    void OnSaveFile_ForSharing()
+    {
+        // get all the objects
+        Transform blocks_grid = this.transform.GetChild(0);
+
+        // extract the grid name from the first block's name up to the first "_" character
+        string name = blocks_grid.GetChild(0).name;
+        name = name.Substring(0, name.IndexOf("_"));
+
+        // detect how many blocks wide and high the grid is
+        int width = Mathf.FloorToInt((blocks_grid.GetChild(blocks_grid.childCount -1).localPosition.x 
+            - blocks_grid.GetChild(0).localPosition.x)/Globals.BlockSpacing);
+        int height = Mathf.FloorToInt((blocks_grid.GetChild(blocks_grid.childCount - 1).localPosition.y
+            - blocks_grid.GetChild(0).localPosition.y) / Globals.BlockSpacing);
+
+        // create a 2D grid to place the GameObjects in
+        GameObject[,] blocksGameObjectList2D = new GameObject[width, height];
+
+        for (int nIndex = 0; nIndex < width; nIndex++)
+        {
+            for (int mIndex = 0; mIndex < height; mIndex++)
+            {
+                blocksGameObjectList2D[nIndex, mIndex] = blocks_grid.GetChild(nIndex * height + mIndex).gameObject;
+            }
+        }
+        
+        BlockDataList blocksList = new BlockDataList(name, blocksGameObjectList2D);
+
+        // Serialze into JSON format 
+        string blockListText = JSONSerializeBlockDataList(blocksList);
+
+        // Save JSON string as file to Documents folder
+        SaveBlockDataListToDocuments(blockListText, name);
+    }
+
+    void createBlocksFromFile(string fileName, bool SpawnSharedObjects)
+    {
+        // load file from documents
+        string blocksJSON = LoadBlocksFromDocuments(fileName).Result;
+
+        // if no file was found or failed, load from app resource file URI
+        if (blocksJSON == null)
+        {
+            blocksJSON = readBlocksJSONFromAppResource(fileName).Result;
+        }
 
         // convert JSON string to blocks data object
-        blockDataList = JSONDeserializeBlockDataList(blocksJSON);
+        BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSON);
 
         // create the block game objects
-        loadBlocksFromDataList(blockDataList, true);
+        createBlocksFromDataList(blocksList, SpawnSharedObjects);
+    }
+
+    private async Task<String> LoadBlocksFromDocuments(string fileName)
+    {
+        // read blocks files and load them into a BlockDataList
+        var documentsFolder = Windows.Storage.KnownFolders.DocumentsLibrary;
+
+        // read from local file
+        try
+        {
+            var file = await documentsFolder.GetFileAsync(fileName);
+            if (file != null)
+            {
+                return await Windows.Storage.FileIO.ReadTextAsync(file);
+            }
+            else
+                return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Failed: reading file (" + ex.Message + ")");
+            return null;
+        }
     }
 
     // Handler to load sample files
@@ -64,17 +138,36 @@ public class BlockIO : MonoBehaviour {
         for (int i = 0; i < fileNames.Length; i++)
         {
             // read blocks JSON string from file
-            blocksJSONList[i] = LoadBlocksFromFile(fileNames[i]).Result;
+            blocksJSONList[i] = readBlocksJSONFromAppResource(fileNames[i]).Result;
         }
 
         // convert JSON string to blocks data object
-        blockDataList = JSONDeserializeBlockDataList(blocksJSONList[3]);
+        BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
 
         // create the block game objects using the first file
-        loadBlocksFromDataList(blockDataList, false);
+        createBlocksFromDataList(blocksList, false);
     }
 
-    private void loadBlocksFromDataList(BlockDataList blocksDataList, bool SpawnSharedObjects)
+    void OnLoadNextBlocks_ForSlideShow()
+    {
+        // rotate to next item in slideshow, if at end, set it back to first item
+        if(blocks_SideShow_CurrentListItem == blocksJSONList.Length)
+            blocks_SideShow_CurrentListItem = 0;
+        else
+            blocks_SideShow_CurrentListItem += 1;
+
+        // load the .blocks data into blocks datastructure
+        BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
+
+        // rotate all the SlideShow's blocks to the new orientation
+        for(int i = 0; i < this.transform.GetChild(0).childCount; i++)
+        {
+            // note: starting at i=1 and indexing using i-1 because the blocks_grid transform itself is included
+            this.transform.GetChild(0).GetChild(i).gameObject.SendMessage("OnRotateAbsolute", Quaternion.Euler(blocksList.BlockDataArray[i].Rotation));
+        }
+    }
+
+    private void createBlocksFromDataList(BlockDataList blocksDataList, bool SpawnSharedObjects)
     {
         float nOffset = blocksDataList.width / 2; // sets the center of grid the grid to 0
         float mOffset = 0; // sets bottom of grid to 0 (to center grid at 0 instead, use "mRows / 2");
@@ -100,19 +193,20 @@ public class BlockIO : MonoBehaviour {
                             1 * blockSpacing,
                             (mIndex - mOffset + 1) * Globals.BlockSpacing),
                         BlockRotation,
-                        blocks_grid,
-                        "MyCube",
+                        this.transform.GetChild(0).gameObject,
+                        blocksDataList.Name,
                         false);
                 }
                 else
                 {
                     // instantiate a local cube in the right spot on the grid
-                    GameObject NewBlock = Instantiate(block_prefab, blocks_grid.transform, false);
+                    GameObject NewBlock = Instantiate(block_prefab, this.transform.GetChild(0), false);
                     NewBlock.transform.localRotation = BlockRotation;
                     NewBlock.transform.localPosition = new Vector3(
                             (nIndex - nOffset) * Globals.BlockSpacing,
                             1 * Globals.BlockSpacing,
                             (mIndex - mOffset + 1) * Globals.BlockSpacing);
+                    NewBlock.name = blocksDataList.Name + "_" + mIndex.ToString() + "-" + nIndex.ToString();
                 }
             }
         }
@@ -249,6 +343,7 @@ public class BlockIO : MonoBehaviour {
         public Vector3 Rotation
         {
             get { return rotation; }
+            set { rotation = value; }
         }
 
         [DataMember]
@@ -269,12 +364,12 @@ public class BlockIO : MonoBehaviour {
         }
     }
 
-    private async Task<String> LoadBlocksFromFile(string fileName)
+    private async Task<string> readBlocksJSONFromAppResource(string fileName)
     {
         // load a .blocks file from app's /Blocks folder
         try
         {
-            Uri fileURI = new Uri(fileName);
+            Uri fileURI = new Uri("ms-appx:///Blocks/" + fileName);
             StorageFile blocksFile = await StorageFile.GetFileFromApplicationUriAsync(fileURI);
             return await FileIO.ReadTextAsync(blocksFile);
         }
@@ -294,21 +389,16 @@ public class BlockIO : MonoBehaviour {
         return returnBlockDataList;
     }
 
-    private async void SaveBlockDataListToFile(BlockDataList blockDataList)
+    private async void SaveBlockDataListToDocuments(string blockListText, string fileName)
     {
-        // Serialze into JSON format 
-        string blockListText = JSONSerializeBlockDataList(blockDataList);
-
         // File info
         var documentsFolder = Windows.Storage.KnownFolders.DocumentsLibrary;
-        //var roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
-        string fileName = blockDataList.Name + ".blocks";
+        fileName = fileName + ".blocks";
 
         try
         {
             // save to local file
             var file = await documentsFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
-            //var file = await roamingFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(file, blockListText);
         }
         catch (Exception ex)

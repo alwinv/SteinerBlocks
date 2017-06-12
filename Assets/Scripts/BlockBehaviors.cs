@@ -31,8 +31,6 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     float scaleSpeed = 100f;
     float rotationSpeed = 360;
 
-    Vector3 currentlyNavigatingDirection;
-
     // Use this for initialization
     void Start () {
         // Grab the original local position, rotation and scale of the cube when the app starts.
@@ -86,9 +84,12 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     public void OnFocusEnter()
     {
         if(!Globals.CurrentlyNavigating 
-            && Globals.Instance.SelectedBlock != this.gameObject 
+            && Globals.Instance.SelectedBlock == null
             && IsNotSelectedBySomeoneElse())
         {
+            // show selection highlight around the block
+            Globals.Instance.SelectionHighlight.SendMessage("OnFocus", this.gameObject);
+
             // move the block up off the matrix plane
             AnimationTargetPosition = new Vector3(
                 this.transform.localPosition.x,
@@ -102,9 +103,12 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     public void OnFocusExit()
     {
         if (!Globals.CurrentlyNavigating
-            && Globals.Instance.SelectedBlock != this.gameObject 
+            && Globals.Instance.SelectedBlock == null
             && IsNotSelectedBySomeoneElse())
         {
+            // hide selection highlight
+            Globals.Instance.SelectionHighlight.SendMessage("OnFocusLost", this.gameObject);
+
             // move the block up back down to the matrix plane
             AnimationTargetPosition = originalLocalPosition;
             movementSpeed = 0.2f;
@@ -127,6 +131,9 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
             originalLocalScale.z * 2);
         animState = AnimationStates.on;
         movementSpeed = 2f;
+
+        // show selection highlight around the block
+        Globals.Instance.SelectionHighlight.SendMessage("OnSelect");
     }
 
     public void OnUnselect()
@@ -138,6 +145,12 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         AnimationTargetScale = originalLocalScale;
         animState = AnimationStates.on;
         movementSpeed = 2f;
+
+        // update file
+        this.SendMessageUpwards("OnSaveFile_ForSharing");
+
+        // hide selection highlight
+        Globals.Instance.SelectionHighlight.SendMessage("OnUnSelect");
     }
 
     public void OnInputClicked(InputClickedEventData eventData)
@@ -150,7 +163,8 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         {
             if(Globals.Instance.SelectedBlock != null)
                 Globals.Instance.SelectedBlock.SendMessage("OnUnselect");
-            this.OnSelect();
+            else
+               this.OnSelect();
         }
     }
 
@@ -250,7 +264,12 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         }
 
     }
-
     #endregion
 
+    void OnRotateAbsolute(Quaternion localRotation)
+    {
+        // save the quaternion for animations
+        this.AnimationTargetRotation = localRotation;
+        animState = AnimationStates.on;
+    }
 }
