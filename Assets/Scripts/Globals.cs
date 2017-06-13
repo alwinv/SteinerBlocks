@@ -30,11 +30,14 @@ public class Globals : MonoBehaviour {
         Instance = this;
 
         // load list of .blocks files from file
-        var fileNames = new string[4];
-        fileNames[0] = "CS_1.blocks";
-        fileNames[1] = "CS_2.blocks";
-        fileNames[2] = "CS_3.blocks";
-        fileNames[3] = "CS_4.blocks";
+        var fileNames = new string[7];
+        fileNames[0] = "001.blocks";
+        fileNames[1] = "081.blocks";
+        fileNames[2] = "084.blocks";
+        fileNames[3] = "085.blocks";
+        fileNames[4] = "086.blocks";
+        fileNames[5] = "087.blocks";
+        fileNames[6] = "091.blocks";
         SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
         timeSinceLastSlide = 0.0f;
 
