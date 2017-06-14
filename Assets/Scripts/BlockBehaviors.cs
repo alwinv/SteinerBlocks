@@ -31,6 +31,9 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     float scaleSpeed = 100f;
     float rotationSpeed = 360;
 
+    // texture
+    Texture blockTexture;
+
     // Use this for initialization
     void Start () {
         // Grab the original local position, rotation and scale of the cube when the app starts.
@@ -45,6 +48,15 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         // initialize the axes transform to be children of the block world
         navStart_axes_transform = new GameObject().transform;
         navStart_axes_transform.SetParent(this.transform.parent);
+
+        // assign a random texture to this block
+        Renderer renderer = this.GetComponent<Renderer>();
+        Texture[] newTextures = new Texture[3];
+        newTextures[0] = Resources.Load<Texture>("block");
+        newTextures[1] = Resources.Load<Texture>("block_01");
+        newTextures[2] = Resources.Load<Texture>("block_02");
+
+        renderer.material.SetTexture("_MainTex", newTextures[Globals.Instance.rnd1.Next(0,2)]);
     }
 
     // Update is called once per frame
