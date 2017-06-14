@@ -25,6 +25,9 @@ public class Globals : MonoBehaviour {
     private float SlideDuration = 5.0f; // how many seconds to show each block arrangement
     private float timeSinceLastSlide = 0.0f;
 
+    // use this for random #s elsewhere in the app
+    public System.Random rnd1 = new System.Random(System.DateTime.Now.Millisecond);
+
     // Use this for initialization
     void Start () {
         Instance = this;

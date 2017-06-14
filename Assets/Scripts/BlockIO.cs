@@ -66,10 +66,8 @@ public class BlockIO : MonoBehaviour {
         // detect how many blocks wide and high the grid is
         // todo: 1000 should be replaced by blocks_grid.ChildCount to support arbitrary grid sizes
         // todo: but there are 2x the expected children in the grids somehow, so it's failing
-        int width = Mathf.FloorToInt((blocks_grid.GetChild(1000 -1).localPosition.x 
-            - blocks_grid.GetChild(0).localPosition.x)/Globals.BlockSpacing) + 1;
-        int height = Mathf.FloorToInt((blocks_grid.GetChild(1000 - 1).localPosition.z
-            - blocks_grid.GetChild(0).localPosition.z) / Globals.BlockSpacing) + 1;
+        int width = 50; //Mathf.FloorToInt((blocks_grid.GetChild(1000 - 1).localPosition.x - blocks_grid.GetChild(0).localPosition.x)/Globals.BlockSpacing) + 1;
+        int height = 20; //Mathf.FloorToInt((blocks_grid.GetChild(1000 - 1).localPosition.z - blocks_grid.GetChild(0).localPosition.z)/Globals.BlockSpacing) + 1;
 
         // create a 2D grid to place the GameObjects in
         GameObject[,] blocksGameObjectList2D = new GameObject[width, height];
@@ -88,13 +86,13 @@ public class BlockIO : MonoBehaviour {
         string blockListText = JSONSerializeBlockDataList(blocksList);
 
         // Save JSON string as file to Documents folder
-        SaveBlockDataListToDocuments(blockListText, name);
+        SaveBlockDataListToRoamingFolder(blockListText, name);
     }
 
     void createBlocksFromFile(string fileName, bool SpawnSharedObjects)
     {
         // load file from documents
-        string blocksJSON = LoadBlocksFromDocuments(fileName).Result;
+        string blocksJSON = LoadBlocksFromRoamingFolder(fileName).Result;
 
         // if no file was found or failed, load from app resource file URI
         if (blocksJSON == null)
@@ -109,15 +107,17 @@ public class BlockIO : MonoBehaviour {
         createBlocksFromDataList(blocksList, SpawnSharedObjects);
     }
 
-    private async Task<String> LoadBlocksFromDocuments(string fileName)
+    private async Task<String> LoadBlocksFromRoamingFolder(string fileName)
     {
         // read blocks files and load them into a BlockDataList
-        var documentsFolder = Windows.Storage.KnownFolders.DocumentsLibrary;
+        //var documentsFolder = Windows.Storage.KnownFolders.DocumentsLibrary;
+        var roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
 
         // read from local file
         try
         {
-            var file = await documentsFolder.GetFileAsync(fileName);
+            //var file = await documentsFolder.GetFileAsync(fileName);
+            var file = await roamingFolder.GetFileAsync(fileName);
             if (file != null)
             {
                 return await Windows.Storage.FileIO.ReadTextAsync(file);
@@ -391,16 +391,18 @@ public class BlockIO : MonoBehaviour {
         return returnBlockDataList;
     }
 
-    private async void SaveBlockDataListToDocuments(string blockListText, string fileName)
+    private async void SaveBlockDataListToRoamingFolder(string blockListText, string fileName)
     {
         // File info
-        var documentsFolder = Windows.Storage.KnownFolders.DocumentsLibrary;
+        //var documentsFolder = Windows.Storage.KnownFolders.DocumentsLibrary;
+        var roamingFolder = Windows.Storage.ApplicationData.Current.RoamingFolder;
         fileName = fileName + ".blocks";
 
         try
         {
             // save to local file
-            var file = await documentsFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
+            //var file = await documentsFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
+            var file = await roamingFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(file, blockListText);
         }
         catch (Exception ex)
