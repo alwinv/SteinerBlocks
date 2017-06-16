@@ -51,12 +51,10 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         // assign a random texture to this block
         Renderer renderer = this.GetComponent<Renderer>();
-        Texture[] newTextures = new Texture[3];
-        newTextures[0] = Resources.Load<Texture>("block");
-        newTextures[1] = Resources.Load<Texture>("block_01");
-        newTextures[2] = Resources.Load<Texture>("block_02");
-
-        renderer.material.SetTexture("_MainTex", newTextures[Globals.Instance.rnd1.Next(0,2)]);
+        int rndNum = Globals.Instance.rnd1.Next(28);
+        Texture newTexture = Resources.Load<Texture>("block_" + rndNum.ToString("D3"));
+        renderer.material.SetTexture("_MainTex", newTexture);
+        renderer.material.SetTexture("_BumpMap", null);
     }
 
     // Update is called once per frame
