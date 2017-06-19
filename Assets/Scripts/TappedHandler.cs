@@ -18,10 +18,14 @@ public class TappedHandler : MonoBehaviour
             GestureSettings.NavigationY |
             GestureSettings.NavigationZ);
         this.recognizer.TappedEvent += OnTapped;
+
+        // block rotation input handlers
         this.recognizer.NavigationStartedEvent += Recognizer_NavigationStartedEvent;
         this.recognizer.NavigationUpdatedEvent += Recognizer_NavigationUpdatedEvent;
         this.recognizer.NavigationCanceledEvent += Recognizer_NavigationCanceledEvent;
         this.recognizer.NavigationCompletedEvent += Recognizer_NavigationCompletedEvent;
+
+        // start recognition
         this.recognizer.StartCapturingGestures();
 
         SharingStage.Instance.SharingManagerConnected += Instance_SharingManagerConnected;

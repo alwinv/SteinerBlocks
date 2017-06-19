@@ -112,7 +112,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
     public void OnFocusExit()
     {
-        if (!Globals.CurrentlyNavigating
+        if(!Globals.CurrentlyNavigating
             && Globals.Instance.SelectedBlock == null
             && IsNotSelectedBySomeoneElse())
         {
@@ -128,26 +128,41 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
     public void OnSelect()
     {
-        Globals.Instance.SelectedBlock = this.gameObject;
+        // todo: does this need to be conditioned to only happen when not dragging?
+        // !this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().IsDraggingEnabled
 
-        // move the block up off the matrix plane
-        AnimationTargetPosition = new Vector3(
-            this.transform.localPosition.x,
-            this.transform.localPosition.y + 4 * Globals.BlockSpacing,
-            this.transform.localPosition.z);
-        AnimationTargetScale = new Vector3(
-            originalLocalScale.x * 2,
-            originalLocalScale.y * 2,
-            originalLocalScale.z * 2);
-        animState = AnimationStates.on;
-        movementSpeed = 2f;
+        if (true)
+        {
+            // disable hand draggable
+            this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = false;
 
-        // show selection highlight around the block
-        Globals.Instance.SelectionHighlight.SendMessage("OnSelect");
+            Globals.Instance.SelectedBlock = this.gameObject;
+
+            // move the block up off the matrix plane
+            AnimationTargetPosition = new Vector3(
+                this.transform.localPosition.x,
+                this.transform.localPosition.y + 4 * Globals.BlockSpacing,
+                this.transform.localPosition.z);
+            AnimationTargetScale = new Vector3(
+                originalLocalScale.x * 2,
+                originalLocalScale.y * 2,
+                originalLocalScale.z * 2);
+            animState = AnimationStates.on;
+            movementSpeed = 2f;
+
+            // show selection highlight around the block
+            Globals.Instance.SelectionHighlight.SendMessage("OnSelect");
+
+            // play sound effect
+            this.GetComponents<AudioSource>()[0].Play();
+        }
     }
 
     public void OnUnselect()
     {
+        // re-enable hand draggable
+        this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = true;
+
         Globals.Instance.SelectedBlock = null;
 
         // move the block back to the original position in the matrix plane
@@ -161,6 +176,9 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         // hide selection highlight
         Globals.Instance.SelectionHighlight.SendMessage("OnUnSelect");
+
+        // play sound effect
+        this.GetComponents<AudioSource>()[0].Play();
     }
 
     public void OnInputClicked(InputClickedEventData eventData)

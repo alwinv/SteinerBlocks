@@ -17,6 +17,7 @@ public class Globals : MonoBehaviour {
 
     // The modal state of the interface
     public static bool CurrentlyNavigating = false;
+    public static bool CurrentlyPositioning = false;
 
     public static float BlockSpacing = 0.02f;
     public static int NavigationSpeed = 5;
