@@ -90,9 +90,9 @@ public class SelectionHighlightCommands : MonoBehaviour {
         }
         originalPosition = this.transform.localPosition;
         this.transform.localScale = new Vector3(
-            originalLocalScale.x * 2,
-            originalLocalScale.y * 2,
-            originalLocalScale.z * 2);
+            originalLocalScale.x * Globals.selectedBlockScale,
+            originalLocalScale.y * Globals.selectedBlockScale,
+            originalLocalScale.z * Globals.selectedBlockScale);
         this.transform.localRotation = Quaternion.Euler(0, 45, 0);
         selectedState = true;
     }

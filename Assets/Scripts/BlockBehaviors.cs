@@ -51,10 +51,11 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         // assign a random texture to this block
         Renderer renderer = this.GetComponent<Renderer>();
-        int rndNum = Globals.Instance.rnd1.Next(28);
-        Texture newTexture = Resources.Load<Texture>("block_" + rndNum.ToString("D3"));
+        int rndNum = Globals.Instance.rnd1.Next(15);
+        Texture newTexture = Resources.Load<Texture>("Textures/block_" + rndNum.ToString("D3"));
+        Texture newBump = Resources.Load<Texture>("Textures/block_" + rndNum.ToString("D3") + "_gray");
         renderer.material.SetTexture("_MainTex", newTexture);
-        renderer.material.SetTexture("_BumpMap", null);
+        renderer.material.SetTexture("_BumpMap", newBump);
     }
 
     // Update is called once per frame
@@ -93,7 +94,11 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
     public void OnFocusEnter()
     {
-        if(!Globals.CurrentlyNavigating 
+        // set stabilization plane to 0,0 of parent
+        Transform gridPlane = this.transform.parent;
+        UnityEngine.VR.WSA.HolographicSettings.SetFocusPointForFrame(gridPlane.position, gridPlane.up);
+
+        if (!Globals.CurrentlyNavigating 
             && Globals.Instance.SelectedBlock == null
             && IsNotSelectedBySomeoneElse())
         {
@@ -133,7 +138,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         if (true)
         {
-            // disable hand draggable
+            // disable parent's hand draggable
             this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = false;
 
             Globals.Instance.SelectedBlock = this.gameObject;
@@ -144,9 +149,9 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
                 this.transform.localPosition.y + 4 * Globals.BlockSpacing,
                 this.transform.localPosition.z);
             AnimationTargetScale = new Vector3(
-                originalLocalScale.x * 2,
-                originalLocalScale.y * 2,
-                originalLocalScale.z * 2);
+                originalLocalScale.x * Globals.selectedBlockScale,
+                originalLocalScale.y * Globals.selectedBlockScale,
+                originalLocalScale.z * Globals.selectedBlockScale);
             animState = AnimationStates.on;
             movementSpeed = 2f;
 
@@ -160,9 +165,6 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
     public void OnUnselect()
     {
-        // re-enable hand draggable
-        this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = true;
-
         Globals.Instance.SelectedBlock = null;
 
         // move the block back to the original position in the matrix plane
@@ -179,6 +181,10 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         // play sound effect
         this.GetComponents<AudioSource>()[0].Play();
+
+        // re-enable hand draggable
+        // todo: undo hack below - make it so dragging doesn't start on parent until a motion delta - to prevent conflicting with block selection
+//        this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = true;
     }
 
     public void OnInputClicked(InputClickedEventData eventData)

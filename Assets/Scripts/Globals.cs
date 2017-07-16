@@ -15,6 +15,9 @@ public class Globals : MonoBehaviour {
     public GameObject SelectedBlock { get; set; }
     public GameObject FocusedObject { get; set; }
 
+    // for cube interactions
+    public static float selectedBlockScale = 1.5f;
+
     // The modal state of the interface
     public static bool CurrentlyNavigating = false;
     public static bool CurrentlyPositioning = false;
@@ -34,16 +37,23 @@ public class Globals : MonoBehaviour {
         Instance = this;
 
         // load list of .blocks files from file
-        var fileNames = new string[7];
-        fileNames[0] = "001.blocks";
-        fileNames[1] = "081.blocks";
-        fileNames[2] = "084.blocks";
-        fileNames[3] = "085.blocks";
-        fileNames[4] = "086.blocks";
-        fileNames[5] = "087.blocks";
-        fileNames[6] = "091.blocks";
-        SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
-        timeSinceLastSlide = 0.0f;
+            string[] fileNames = {
+                "001.blocks",
+                "002.blocks",
+                "003.blocks",
+                "004.blocks",
+                "005.blocks",
+                "013.blocks",
+                "014.blocks",
+                "015.blocks",
+                "081.blocks",
+                "084.blocks",
+                "085.blocks",
+                "086.blocks",
+                "087.blocks",
+                "091.blocks"};
+            SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
+            timeSinceLastSlide = 0.0f;
 
         // load local block grid
         LocalBlocks_Parent.SendMessage("OnLoadFile_ForLocal", "my.blocks");

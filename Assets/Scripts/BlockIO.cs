@@ -22,6 +22,7 @@ public class BlockIO : MonoBehaviour {
 
     private string[] blocksJSONList;
     private int blocks_SideShow_CurrentListItem = 0;
+    public float scaleFactor = 1.9f;
 
     // Enum to use in re-positioning the grids
     public enum Orientation
@@ -32,6 +33,7 @@ public class BlockIO : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        this.transform.localScale = this.transform.localScale * scaleFactor;
     }
 
     // Update is called once per frame
@@ -164,7 +166,6 @@ public class BlockIO : MonoBehaviour {
         // rotate all the SlideShow's blocks to the new orientation
         for(int i = 0; i < blocksList.BlockDataArray.Length; i++)
         {
-            // note: starting at i=1 and indexing using i-1 because the blocks_grid transform itself is included
             this.transform.GetChild(0).GetChild(i).gameObject.SendMessage("OnRotateAbsolute", Quaternion.Euler(blocksList.BlockDataArray[i].Rotation));
         }
     }
