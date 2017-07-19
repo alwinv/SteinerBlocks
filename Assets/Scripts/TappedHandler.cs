@@ -33,7 +33,17 @@ public class TappedHandler : MonoBehaviour
 
     private void Instance_SharingManagerConnected(object sender, System.EventArgs e)
     {
-        throw new System.NotImplementedException();
+        //// If we're networking...
+        //if (SharingStage.Instance.IsConnected)
+        //{
+        //    // if there are no shared blocks yet, create them
+        //    if (SharingStage.Instance.Root.InstantiatedPrefabs.GetDataArray().GetLength(0) == 0)
+        //    {
+        //        // load blocks into the block grid
+        //        sharedBlocks_Grid.SendMessage("OnLoadFile_ForSharing", "001.blocks");
+        //    }
+        //    //this.recognizer.TappedEvent -= OnTapped;
+        //}
     }
 
     private void Recognizer_NavigationStartedEvent(InteractionSourceKind source, Vector3 normalizedOffset, Ray headRay)
@@ -128,10 +138,10 @@ public class TappedHandler : MonoBehaviour
         if (SharingStage.Instance.IsConnected)
         {
             // if there are no shared blocks yet, create them
-            if(SharingStage.Instance.Root.InstantiatedPrefabs.GetDataArray().GetLength(0) == 0)
+            if (SharingStage.Instance.Root.InstantiatedPrefabs.GetDataArray().GetLength(0) == 0)
             {
                 // load blocks into the block grid
-                sharedBlocks_Grid.SendMessage("OnLoadFile_ForSharing", "1.blocks");
+                sharedBlocks_Grid.SendMessage("OnLoadFile_ForSharing", "shared.blocks");
             }
             this.recognizer.TappedEvent -= OnTapped;
         }

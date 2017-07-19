@@ -155,10 +155,14 @@ public class BlockIO : MonoBehaviour {
     void OnLoadNextBlocks_ForSlideShow()
     {
         // rotate to next item in slideshow, if at end, set it back to first item
-        if(blocks_SideShow_CurrentListItem == blocksJSONList.Length)
-            blocks_SideShow_CurrentListItem = 0;
-        else
+        if (blocks_SideShow_CurrentListItem < (blocksJSONList.Length-1))
+        {
             blocks_SideShow_CurrentListItem += 1;
+        }
+        else
+        {
+            blocks_SideShow_CurrentListItem = 0;
+        }
 
         // load the .blocks data into blocks datastructure
         BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);

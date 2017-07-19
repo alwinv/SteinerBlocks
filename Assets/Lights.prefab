@@ -5,10 +5,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 401900}
-  - 108: {fileID: 10882850}
+  - component: {fileID: 401900}
+  - component: {fileID: 10882850}
   m_Layer: 0
   m_Name: Directional light
   m_TagString: Untagged
@@ -21,9 +21,9 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 412860}
+  - component: {fileID: 412860}
   m_Layer: 0
   m_Name: Lights
   m_TagString: Untagged
@@ -36,10 +36,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 411140}
-  - 108: {fileID: 10853092}
+  - component: {fileID: 411140}
+  - component: {fileID: 10853092}
   m_Layer: 0
   m_Name: Directional light
   m_TagString: Untagged
@@ -52,10 +52,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 473680}
-  - 108: {fileID: 10813818}
+  - component: {fileID: 473680}
+  - component: {fileID: 10813818}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -135,6 +135,7 @@ Light:
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
@@ -168,6 +169,7 @@ Light:
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
@@ -201,6 +203,7 @@ Light:
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
