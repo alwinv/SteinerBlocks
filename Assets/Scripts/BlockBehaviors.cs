@@ -5,7 +5,6 @@ using HoloToolkit.Unity.InputModule;
 
 public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 {
-
     Vector3 originalLocalPosition;
     Vector3 AnimationTargetPosition;
     Vector3 AnimationTargetScale;
@@ -31,9 +30,6 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     float scaleSpeed = 100f;
     float rotationSpeed = 360;
 
-    // texture
-    Texture blockTexture;
-
     // Use this for initialization
     void Start () {
         // Grab the original local position, rotation and scale of the cube when the app starts.
@@ -51,7 +47,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         // assign a random texture to this block
         Renderer renderer = this.GetComponent<Renderer>();
-        int rndNum = Globals.Instance.rnd1.Next(15);
+        int rndNum = Globals.Instance.rnd1.Next(26);
         Texture newTexture = Resources.Load<Texture>("Textures/block_" + rndNum.ToString("D3"));
         Texture newBump = Resources.Load<Texture>("Textures/block_" + rndNum.ToString("D3") + "_gray");
         renderer.material.SetTexture("_MainTex", newTexture);

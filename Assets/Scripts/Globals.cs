@@ -22,7 +22,7 @@ public class Globals : MonoBehaviour {
     public static bool CurrentlyNavigating = false;
     public static bool CurrentlyPositioning = false;
 
-    public static float BlockSpacing = 0.02f;
+    public static float BlockSpacing = 0.0195f;
     public static int NavigationSpeed = 5;
     public static int NavigationToRotationFactor = 180; // one full rotation per 1F of distance navigated
 
@@ -46,6 +46,9 @@ public class Globals : MonoBehaviour {
                 "013.blocks",
                 "014.blocks",
                 "015.blocks",
+                "016.blocks",
+                "017.blocks",
+                "018.blocks",
                 "081.blocks",
                 "084.blocks",
                 "085.blocks",
