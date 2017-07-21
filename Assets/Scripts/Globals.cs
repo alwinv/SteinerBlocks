@@ -16,7 +16,7 @@ public class Globals : MonoBehaviour {
     public GameObject FocusedObject { get; set; }
 
     // for cube interactions
-    public static float selectedBlockScale = 1.5f;
+    public static float selectedBlockScale = 1.25f;
 
     // The modal state of the interface
     public static bool CurrentlyNavigating = false;
@@ -36,27 +36,8 @@ public class Globals : MonoBehaviour {
     void Start () {
         Instance = this;
 
-        // load list of .blocks files from file
-            string[] fileNames = {
-                "001.blocks",
-                "002.blocks",
-                "003.blocks",
-                "004.blocks",
-                "005.blocks",
-                "013.blocks",
-                "014.blocks",
-                "015.blocks",
-                "016.blocks",
-                "017.blocks",
-                "018.blocks",
-                "081.blocks",
-                "084.blocks",
-                "085.blocks",
-                "086.blocks",
-                "087.blocks",
-                "091.blocks"};
-            SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
-            timeSinceLastSlide = 0.0f;
+        // load slide show grid
+        OnLoadSlideShow();
 
         // load local block grid
         LocalBlocks_Parent.SendMessage("OnLoadFile_ForLocal", "my.blocks");
@@ -73,5 +54,21 @@ public class Globals : MonoBehaviour {
         {
             timeSinceLastSlide += Time.deltaTime;
         }
+    }
+
+    public void OnLoadSlideShow()
+    {
+        // load list of .blocks files from file
+        string[] fileNames = {
+                "001.blocks","002.blocks","003.blocks","004.blocks","005.blocks",
+                "013.blocks","014.blocks","015.blocks","016.blocks","017.blocks","018.blocks",
+                "081.blocks",
+                "084.blocks","085.blocks","086.blocks","087.blocks",
+                "091.blocks"};
+        SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
+        timeSinceLastSlide = 0.0f;
+
+        //// hide other blocks
+        //SlideShowBlocks_Parent.SendMessage("OnHide");
     }
 }

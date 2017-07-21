@@ -14,6 +14,26 @@ public class BlocksParentBehaviors : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-
     }
+
+    public void OnHide()
+    {
+        MeshRenderer[] meshRenderers = this.transform.GetComponentsInChildren<MeshRenderer>();
+        foreach (MeshRenderer mr in meshRenderers)
+        {
+            if (mr != null)
+                mr.enabled = false;
+        }
+    }
+
+    public void OnShow()
+    {
+        MeshRenderer[] meshRenderers = this.transform.GetComponentsInChildren<MeshRenderer>();
+        foreach (MeshRenderer mr in meshRenderers)
+        {
+            if (mr != null)
+                mr.enabled = true;
+        }
+    }
+
 }

@@ -16,12 +16,12 @@ public class SelectionHighlightCommands : MonoBehaviour {
         originalLocalScale = this.transform.localScale;
         originalLocalRotation = this.transform.localRotation;
         meshRenderers_focus = this.transform.FindChild("FocusHighlight").GetComponentsInChildren<MeshRenderer>();
-        meshRenderers_selection = this.transform.FindChild("SelectionHighlight").GetComponentsInChildren<MeshRenderer>();
         foreach (MeshRenderer mr in meshRenderers_focus)
         {
             if(mr != null)
                 mr.enabled = false;
         }
+        meshRenderers_selection = this.transform.FindChild("SelectionHighlight").GetComponentsInChildren<MeshRenderer>();
         foreach (MeshRenderer mr in meshRenderers_selection)
         {
             if (mr != null)

@@ -22,7 +22,7 @@ public class BlockIO : MonoBehaviour {
 
     private string[] blocksJSONList;
     private int blocks_SideShow_CurrentListItem = 0;
-    public float scaleFactor = 1.9f;
+    public float scaleFactor;
 
     // Enum to use in re-positioning the grids
     public enum Orientation
@@ -33,7 +33,6 @@ public class BlockIO : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        this.transform.localScale = this.transform.localScale * scaleFactor;
     }
 
     // Update is called once per frame
@@ -48,12 +47,18 @@ public class BlockIO : MonoBehaviour {
     void OnLoadFile_ForLocal(string fileName)
     {
         createBlocksFromFile(fileName, false);
+
+        // scale up a bit
+        this.transform.localScale = this.transform.localScale * scaleFactor;
     }
 
     // Handler to load a shared file 
     void OnLoadFile_ForSharing (string fileName)
     {
         createBlocksFromFile(fileName, true);
+
+        // scale up a bit
+        this.transform.localScale = this.transform.localScale * scaleFactor;
     }
 
     void OnSaveFile_ForLocal()
@@ -150,6 +155,9 @@ public class BlockIO : MonoBehaviour {
 
         // create the block game objects using the first file
         createBlocksFromDataList(blocksList, false);
+
+        // scale up a bit
+        this.transform.localScale = this.transform.localScale * scaleFactor;
     }
 
     void OnLoadNextBlocks_ForSlideShow()
