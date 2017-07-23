@@ -1,8 +1,9 @@
 ﻿using HoloToolkit.Sharing;
 using UnityEngine;
 using UnityEngine.VR.WSA.Input;
+using HoloToolkit.Unity.InputModule;
 
-public class TappedHandler : MonoBehaviour
+public class TappedHandler : MonoBehaviour, ISpeechHandler
 {
     public GameObject sharedBlocks_Grid;
 
@@ -134,6 +135,53 @@ public class TappedHandler : MonoBehaviour
             }
             this.recognizer.TappedEvent -= OnTapped;
         }
+    }
+
+    public void OnSpeechKeywordRecognized(SpeechKeywordRecognizedEventData eventData)
+    {
+        if (Globals.Instance.SelectedBlock != null)
+        {
+            string keyWords = eventData.RecognizedText.ToLower();
+            switch (keyWords)
+            {
+                case "left":
+                    Globals.Instance.SelectedBlock.SendMessage("OnTurnLeft");
+                    break;
+                case "right":
+                    Globals.Instance.SelectedBlock.SendMessage("OnTurnRight");
+                    break;
+                case "up":
+                    Globals.Instance.SelectedBlock.SendMessage("OnTurnUp");
+                   break;
+                case "down":
+                    Globals.Instance.SelectedBlock.SendMessage("OnTurnDown");
+                    break;
+                case "turn":
+                    Globals.Instance.SelectedBlock.SendMessage("OnRotate");
+                    break;
+                case "flip":
+                    Globals.Instance.SelectedBlock.SendMessage("OnFlip");
+                    break;
+                case "release":
+                    Globals.Instance.SelectedBlock.SendMessage("OnUnselect");
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (Globals.Instance.FocusedObject != null)
+        {
+            string keyWords = eventData.RecognizedText.ToLower();
+            switch (keyWords)
+            {
+                case "select":
+                    Globals.Instance.FocusedObject.SendMessage("OnSelect");
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
 
 }

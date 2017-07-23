@@ -6,6 +6,8 @@ using System;
 
 public class BlocksParentBehaviors : MonoBehaviour {
 
+    public bool IsEditable;
+
     // Use this for initialization
     void Start()
     {

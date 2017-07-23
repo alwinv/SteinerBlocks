@@ -60,7 +60,9 @@ public class Globals : MonoBehaviour {
     {
         // load list of .blocks files from file
         string[] fileNames = {
-                "001.blocks","002.blocks","003.blocks","004.blocks","005.blocks",
+                "001.blocks","002.blocks","003.blocks","004.blocks",
+                "005.blocks",
+                "006.blocks",
                 "013.blocks","014.blocks","015.blocks","016.blocks","017.blocks","018.blocks",
                 "081.blocks",
                 "084.blocks","085.blocks","086.blocks","087.blocks",

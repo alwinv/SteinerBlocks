@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
+using System;
 
 public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 {
@@ -80,6 +81,19 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         }
     }
 
+    private bool ImEditable()
+    {
+        var blockparentscript = (BlocksParentBehaviors) this.transform.parent.parent.gameObject.GetComponent(typeof(BlocksParentBehaviors));
+        if (blockparentscript.IsEditable)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     private bool IsNotSelectedBySomeoneElse()
     {
         if (this.transform.localPosition.y != (originalLocalPosition.y + 4 * Globals.BlockSpacing))
@@ -87,6 +101,11 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         else
             return false;
     }
+
+    #region userinput
+    // 
+    // handlers for user input
+    // 
 
     public void OnFocusEnter()
     {
@@ -96,7 +115,8 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         if (!Globals.CurrentlyNavigating 
             && Globals.Instance.SelectedBlock == null
-            && IsNotSelectedBySomeoneElse())
+            && IsNotSelectedBySomeoneElse()
+            && ImEditable())
         {
             // show selection highlight around the block
             Globals.Instance.SelectionHighlight.SendMessage("OnFocus", this.gameObject);
@@ -115,7 +135,8 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     {
         if(!Globals.CurrentlyNavigating
             && Globals.Instance.SelectedBlock == null
-            && IsNotSelectedBySomeoneElse())
+            && IsNotSelectedBySomeoneElse()
+            && ImEditable())
         {
             // hide selection highlight
             Globals.Instance.SelectionHighlight.SendMessage("OnFocusLost", this.gameObject);
@@ -132,7 +153,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         // todo: does this need to be conditioned to only happen when not dragging?
         // !this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().IsDraggingEnabled
 
-        if (true)
+        if (ImEditable())
         {
             // disable parent's hand draggable
             this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = false;
@@ -197,6 +218,8 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
                this.OnSelect();
         }
     }
+
+    #endregion
 
     #region navigation
     //
@@ -294,7 +317,6 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         }
 
     }
-    #endregion
 
     void OnRotateAbsolute(Quaternion localRotation)
     {
@@ -302,4 +324,89 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         this.AnimationTargetRotation = localRotation;
         animState = AnimationStates.on;
     }
+    #endregion
+
+    #region voice
+    // Called by SpeechManager when the user says the "Rotate" command
+    void OnRotate()
+    {
+        // calculate and store transform for "front" of block
+        initFrontFace_transform();
+
+        // rotate the cube around the Block World's y axis by 90 degrees.
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.forward, 90);
+        animState = AnimationStates.on;
+    }
+
+    // Called by SpeechManager when the user says the "Rotate" command
+    void OnFlip()
+    {
+        // calculate and store transform for "front" of block
+        initFrontFace_transform();
+
+        // rotate the cube around the Block World's y axis by 90 degrees.
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.forward, 180);
+        animState = AnimationStates.on;
+    }
+
+    // Called by SpeechManager when the user says the "Turn Left" command
+    void OnTurnLeft()
+    {
+        // calculate and store transform for "front" of block
+        initFrontFace_transform();
+
+        // rotate the cube around the Block World's y axis by 90 degrees.
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.up, 90);
+        animState = AnimationStates.on;
+    }
+
+    // Called by SpeechManager when the user says the "Turn Right" command
+    void OnTurnRight()
+    {
+        // calculate and store transform for "front" of block
+        initFrontFace_transform();
+
+        // rotate the cube around the Block World's y axis by -90 degrees.
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.up, -90);
+        animState = AnimationStates.on;
+    }
+
+    // Called by SpeechManager when the user says the "Turn Up" command
+    void OnTurnUp()
+    {
+        // calculate and store transform for "front" of block
+        initFrontFace_transform();
+
+        // rotate the cube around the Block World's x axis by 90 degrees.
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.right, 90);
+        animState = AnimationStates.on;
+    }
+
+    // Called by SpeechManager when the user says the "Turn Down" command
+    void OnTurnDown()
+    {
+        // calculate and store transform for "front" of block
+        initFrontFace_transform();
+
+        // rotate the cube around the Block World's x axis by 90 degrees.
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.right, -90);
+        animState = AnimationStates.on;
+    }
+
+    Quaternion newRotation(Transform initialTransform, Vector3 axis, float angle)
+    {
+        // find the transform rotation in world coordinates
+        var tempTransform = new GameObject().transform;
+        tempTransform.parent = initialTransform.parent;
+        tempTransform.position.Set(
+            initialTransform.position.x,
+            initialTransform.position.y,
+            initialTransform.position.z);
+        tempTransform.rotation = Quaternion.Euler(initialTransform.rotation.eulerAngles.x,
+            initialTransform.rotation.eulerAngles.y,
+            initialTransform.rotation.eulerAngles.z);
+        tempTransform.RotateAround(tempTransform.position, axis, angle);
+        return tempTransform.localRotation;
+    }
+    #endregion
 }

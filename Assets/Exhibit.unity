@@ -195,6 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9631c0e2221cc9840a329fb85817a09f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsEditable: 0
 --- !u!114 &21985379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,18 +247,6 @@ AudioSource:
       value: 1
       inSlope: 0
       outSlope: 0
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 0.6596595
-      value: 0.7958441
-      inSlope: -0.88521296
-      outSlope: -0.88521296
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 0.83750707
-      value: 0.2536893
-      inSlope: -3.5134652
-      outSlope: -3.5134652
       tangentMode: 0
     - serializedVersion: 2
       time: 1
@@ -551,6 +540,7 @@ GameObject:
   - component: {fileID: 746836556}
   - component: {fileID: 746836555}
   - component: {fileID: 746836554}
+  - component: {fileID: 746836557}
   m_Layer: 0
   m_Name: Room
   m_TagString: Untagged
@@ -694,6 +684,35 @@ MonoBehaviour:
   extents: {x: 10, y: 10, z: 10}
   origin: {x: 0, y: 0, z: 0}
   orientation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &746836557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 746836547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f269343d8ce16b240bbbe1c9f4591703, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RecognizerStart: 0
+  Keywords:
+  - Keyword: left
+    KeyCode: 0
+  - Keyword: right
+    KeyCode: 0
+  - Keyword: up
+    KeyCode: 0
+  - Keyword: down
+    KeyCode: 0
+  - Keyword: turn
+    KeyCode: 0
+  - Keyword: flip
+    KeyCode: 0
+  - Keyword: select
+    KeyCode: 0
+  - Keyword: release
+    KeyCode: 0
 --- !u!1 &789361041
 GameObject:
   m_ObjectHideFlags: 0
@@ -905,6 +924,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9631c0e2221cc9840a329fb85817a09f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsEditable: 1
 --- !u!114 &952495023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -938,6 +958,88 @@ MonoBehaviour:
   PositionLerpSpeed: 0.2
   RotationLerpSpeed: 0.2
   IsDraggingEnabled: 1
+--- !u!1 &1253498898
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1253498899}
+  - component: {fileID: 1253498901}
+  - component: {fileID: 1253498900}
+  m_Layer: 0
+  m_Name: PromptText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1253498899
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1253498898}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.0452, z: 0}
+  m_LocalScale: {x: 0.005, y: 0.005, z: 0.005}
+  m_Children: []
+  m_Father: {fileID: 2084685285}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!102 &1253498900
+TextMesh:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1253498898}
+  m_Text: Tap to start
+  m_OffsetZ: 0
+  m_CharacterSize: 1
+  m_LineSpacing: 1
+  m_Anchor: 4
+  m_Alignment: 1
+  m_TabSize: 4
+  m_FontSize: 24
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Color:
+    serializedVersion: 2
+    rgba: 1912602623
+--- !u!23 &1253498901
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1253498898}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
 --- !u!1 &1495195201
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,6 +1196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9631c0e2221cc9840a329fb85817a09f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsEditable: 1
 --- !u!114 &1655391321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1229,6 +1332,7 @@ Transform:
   m_Children:
   - {fileID: 527697122}
   - {fileID: 789361042}
+  - {fileID: 1253498899}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

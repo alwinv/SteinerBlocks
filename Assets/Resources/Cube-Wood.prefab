@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 65000012273573980}
   - component: {fileID: 114303889503286782}
   - component: {fileID: 82802811273890674}
+  - component: {fileID: 114301554385089992}
   m_Layer: 0
   m_Name: Cube-Wood
   m_TagString: Untagged
@@ -174,6 +175,36 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &114301554385089992
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013769219478}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c62fd7a55ba7458499b69cae18f83806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputManager: {fileID: 0}
+  RecognizerStart: 0
+  Keywords:
+  - Keyword: 6c656674
+    KeyCode: 276
+  - Keyword: 7269676874
+    KeyCode: 275
+  - Keyword: 7570
+    KeyCode: 273
+  - Keyword: 646f776e
+    KeyCode: 274
+  - Keyword: 7475726e
+    KeyCode: 0
+  - Keyword: 666c6970
+    KeyCode: 0
+  - Keyword: 73656c656374
+    KeyCode: 0
+  - Keyword: 72656c65617365
+    KeyCode: 0
 --- !u!114 &114303889503286782
 MonoBehaviour:
   m_ObjectHideFlags: 1
