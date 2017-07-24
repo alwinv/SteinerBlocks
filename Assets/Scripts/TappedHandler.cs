@@ -190,10 +190,10 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
                 Globals.Instance.SlideShowBlocks_Parent.SendMessage("OnHide");
                 Globals.Instance.SlideShowRunning = false;
                 break;
-            case "pause slide show":
+            case "pause":
                 Globals.Instance.SlideShowRunning = false;
                 break;
-            case "resume slide show":
+            case "resume":
                 Globals.Instance.SlideShowRunning = true;
                 break;
             case "show my blocks":

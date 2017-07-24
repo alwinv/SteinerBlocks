@@ -233,7 +233,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 3
+  MaxDistance: 4
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0
@@ -727,9 +727,9 @@ MonoBehaviour:
     KeyCode: 0
   - Keyword: Hide My Blocks
     KeyCode: 0
-  - Keyword: Pause Slide Show
+  - Keyword: Pause
     KeyCode: 0
-  - Keyword: Resume Slide Show
+  - Keyword: Resume
     KeyCode: 0
 --- !u!1 &789361041
 GameObject:
@@ -1094,7 +1094,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1253498898}
-  m_Text: "Welcome to Steiner Blocks'\r\nvirtual, interactive exhibit.\r\n\nThis experience
+  m_Text: "Welcome to Steiner Blocks\nvirtual, interactive exhibit.\r\n\nThis experience
     is based on \r\nCurtis Steiner's 1,000 Blocks, \r\nwhich is part of the Seattle
     Art \r\nMuseum's permanent collection.\r\n\n\n\n\nAudio: http://www.bensound.com"
   m_OffsetZ: 0

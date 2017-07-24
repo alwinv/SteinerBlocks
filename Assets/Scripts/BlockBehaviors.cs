@@ -334,7 +334,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         initFrontFace_transform();
 
         // rotate the cube around the Block World's y axis by 90 degrees.
-        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.forward, 90);
+        AnimationTargetRotation = newRotation(this.transform, navStart_axes_transform.forward, -90);
         animState = AnimationStates.on;
     }
 
