@@ -9,6 +9,7 @@ public class Globals : MonoBehaviour {
 
     public GameObject SlideShowBlocks_Parent;
     public GameObject LocalBlocks_Parent;
+    public GameObject SharedBlocks_Parent;
     public GameObject SelectionHighlight;
 
     // The cube that is currently being edited
@@ -28,6 +29,7 @@ public class Globals : MonoBehaviour {
 
     private float SlideDuration = 5.0f; // how many seconds to show each block arrangement
     private float timeSinceLastSlide = 0.0f;
+    public bool SlideShowRunning = false;
 
     // use this for random #s elsewhere in the app
     public System.Random rnd1 = new System.Random(System.DateTime.Now.Millisecond);
@@ -36,23 +38,29 @@ public class Globals : MonoBehaviour {
     void Start () {
         Instance = this;
 
-        // load slide show grid
+        // load slide show grid hidden & not running
         OnLoadSlideShow();
+        SlideShowBlocks_Parent.SendMessage("OnHide");
+        SlideShowRunning = false;
 
         // load local block grid
         LocalBlocks_Parent.SendMessage("OnLoadFile_ForLocal", "my.blocks");
+        LocalBlocks_Parent.SendMessage("OnHide");
     }
 
     // Update is called once per frame
     void Update () {
-        if(timeSinceLastSlide + Time.deltaTime >= SlideDuration)
+        if(SlideShowRunning)
         {
-            timeSinceLastSlide = 0.0f;
-            SlideShowBlocks_Parent.SendMessage("OnLoadNextBlocks_ForSlideShow");
-        }
-        else
-        {
-            timeSinceLastSlide += Time.deltaTime;
+            if (timeSinceLastSlide + Time.deltaTime >= SlideDuration)
+            {
+                timeSinceLastSlide = 0.0f;
+                SlideShowBlocks_Parent.SendMessage("OnLoadNextBlocks_ForSlideShow");
+            }
+            else
+            {
+                timeSinceLastSlide += Time.deltaTime;
+            }
         }
     }
 
@@ -69,8 +77,5 @@ public class Globals : MonoBehaviour {
                 "091.blocks"};
         SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
         timeSinceLastSlide = 0.0f;
-
-        //// hide other blocks
-        //SlideShowBlocks_Parent.SendMessage("OnHide");
     }
 }

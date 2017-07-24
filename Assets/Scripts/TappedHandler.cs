@@ -139,9 +139,9 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
 
     public void OnSpeechKeywordRecognized(SpeechKeywordRecognizedEventData eventData)
     {
+        string keyWords = eventData.RecognizedText.ToLower();
         if (Globals.Instance.SelectedBlock != null)
         {
-            string keyWords = eventData.RecognizedText.ToLower();
             switch (keyWords)
             {
                 case "left":
@@ -171,7 +171,6 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
         }
         else if (Globals.Instance.FocusedObject != null)
         {
-            string keyWords = eventData.RecognizedText.ToLower();
             switch (keyWords)
             {
                 case "select":
@@ -181,7 +180,37 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
                     break;
             }
         }
-
+        switch (keyWords)
+        {
+            case "show examples":
+                Globals.Instance.SlideShowBlocks_Parent.SendMessage("OnShow");
+                Globals.Instance.SlideShowRunning = true;
+                break;
+            case "hide examples":
+                Globals.Instance.SlideShowBlocks_Parent.SendMessage("OnHide");
+                Globals.Instance.SlideShowRunning = false;
+                break;
+            case "pause slide show":
+                Globals.Instance.SlideShowRunning = false;
+                break;
+            case "resume slide show":
+                Globals.Instance.SlideShowRunning = true;
+                break;
+            case "show my blocks":
+                Globals.Instance.LocalBlocks_Parent.SendMessage("OnShow");
+                break;
+            case "hide my blocks":
+                Globals.Instance.LocalBlocks_Parent.SendMessage("OnHide");
+                break;
+            case "show shared blocks":
+                Globals.Instance.SharedBlocks_Parent.SendMessage("OnShow");
+                break;
+            case "hide shared blocks":
+                Globals.Instance.SharedBlocks_Parent.SendMessage("OnHide");
+                break;
+            default:
+                break;
+        }
     }
 
 }
