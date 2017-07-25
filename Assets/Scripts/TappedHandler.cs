@@ -198,6 +198,7 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
                 break;
             case "show my blocks":
                 Globals.Instance.LocalBlocks_Parent.SendMessage("OnShow");
+                this.SendMessageUpwards("OnIntroToEditing");
                 break;
             case "hide my blocks":
                 Globals.Instance.LocalBlocks_Parent.SendMessage("OnHide");

@@ -1,11 +1,7 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-using UnityEngine;
-//using HoloToolkit.Unity.InputModule;
+﻿using UnityEngine;
 using System;
 using System.IO;
 using System.Text;
-//using HoloToolkit.Sharing;
 using HoloToolkit.Sharing.Spawning;
 #if !UNITY_EDITOR
 using System.Runtime.Serialization;
@@ -19,9 +15,13 @@ public class BlockIO : MonoBehaviour {
     public PrefabSpawnManager spawnManager;
     public GameObject block_prefab;
     public GameObject blocks_grid;
-
+    #if !UNITY_EDITOR
+    private BlockDataList blocksList;
+    #endif
     private string[] blocksJSONList;
     private int blocks_SideShow_CurrentListItem = 0;
+    private struct size { public int width, height; public size(int Width, int Height) { width = Width; height = Height; } };
+    private size BlockGridSize;
     public float scaleFactor;
 
     // Enum to use in re-positioning the grids
@@ -73,8 +73,8 @@ public class BlockIO : MonoBehaviour {
         // detect how many blocks wide and high the grid is
         // todo: 1000 should be replaced by blocks_grid.ChildCount to support arbitrary grid sizes
         // todo: but there are 2x the expected children in the grids somehow, so it's failing
-        int width = 50; //Mathf.FloorToInt((blocks_grid.GetChild(1000 - 1).localPosition.x - blocks_grid.GetChild(0).localPosition.x)/Globals.BlockSpacing) + 1;
-        int height = 20; //Mathf.FloorToInt((blocks_grid.GetChild(1000 - 1).localPosition.z - blocks_grid.GetChild(0).localPosition.z)/Globals.BlockSpacing) + 1;
+        int width = blocksList.width; //50; 
+        int height = blocksList.height; //20;
 
         // create a 2D grid to place the GameObjects in
         GameObject[,] blocksGameObjectList2D = new GameObject[width, height];
@@ -87,7 +87,7 @@ public class BlockIO : MonoBehaviour {
             }
         }
         
-        BlockDataList blocksList = new BlockDataList(name, blocksGameObjectList2D);
+        blocksList = new BlockDataList(name, blocksGameObjectList2D);
 
         // Serialze into JSON format 
         string blockListText = JSONSerializeBlockDataList(blocksList);
@@ -108,10 +108,12 @@ public class BlockIO : MonoBehaviour {
         }
 
         // convert JSON string to blocks data object
-        BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSON);
+        blocksList = JSONDeserializeBlockDataList(blocksJSON);
 
         // create the block game objects
         createBlocksFromDataList(blocksList, SpawnSharedObjects);
+        BlockGridSize.width = blocksList.width;
+        BlockGridSize.height = blocksList.height;
     }
 
     private async Task<String> LoadBlocksFromRoamingFolder(string fileName)
@@ -151,7 +153,7 @@ public class BlockIO : MonoBehaviour {
         }
 
         // convert JSON string to blocks data object
-        BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
+        blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
 
         // create the block game objects using the first file
         createBlocksFromDataList(blocksList, false);
@@ -173,7 +175,7 @@ public class BlockIO : MonoBehaviour {
         }
 
         // load the .blocks data into blocks datastructure
-        BlockDataList blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
+        blocksList = JSONDeserializeBlockDataList(blocksJSONList[blocks_SideShow_CurrentListItem]);
 
         // rotate all the SlideShow's blocks to the new orientation
         for(int i = 0; i < blocksList.BlockDataArray.Length; i++)
