@@ -16,12 +16,27 @@ public class Globals : MonoBehaviour {
     // The cube that is currently being edited
     public GameObject SelectedBlock { get; set; }
     public GameObject FocusedObject { get; set; }
+    public enum SelectionType
+    {
+        Block, Row, Column, All, Custom
+    }
+    public SelectionType SelectionMode { get; set; }
+    public struct size
+    {
+        public int width, height;
+        public size(int Width, int Height)
+        {
+            width = Width;
+            height = Height;
+        }
+    };
 
     // for cube interactions
     public static float selectedBlockScale = 1.25f;
 
     // The modal state of the interface
     public static bool CurrentlyNavigating = false;
+    public static Vector3 CurrentlyNavigatingDirection = Vector3.zero;
     public static bool CurrentlyPositioning = false;
 
     public static float BlockSpacing = 0.0195f;

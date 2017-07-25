@@ -20,10 +20,7 @@ public class BlockIO : MonoBehaviour {
     #endif
     private string[] blocksJSONList;
     private int blocks_SideShow_CurrentListItem = 0;
-    private struct size { public int width, height; public size(int Width, int Height) { width = Width; height = Height; } };
-    private size BlockGridSize;
     public float scaleFactor;
-
     // Enum to use in re-positioning the grids
     public enum Orientation
     {
@@ -96,6 +93,16 @@ public class BlockIO : MonoBehaviour {
         SaveBlockDataListToRoamingFolder(blockListText, name);
     }
 
+    public Globals.size GetBlockGridSize()
+    {
+        if (blocksList != null)
+        {
+            return new Globals.size(blocksList.width, blocksList.height);
+        }
+        else
+            return new Globals.size(0, 0);
+    }
+
     void createBlocksFromFile(string fileName, bool SpawnSharedObjects)
     {
         // load file from documents
@@ -112,8 +119,6 @@ public class BlockIO : MonoBehaviour {
 
         // create the block game objects
         createBlocksFromDataList(blocksList, SpawnSharedObjects);
-        BlockGridSize.width = blocksList.width;
-        BlockGridSize.height = blocksList.height;
     }
 
     private async Task<String> LoadBlocksFromRoamingFolder(string fileName)

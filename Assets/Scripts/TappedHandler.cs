@@ -8,7 +8,6 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
     public GameObject sharedBlocks_Grid;
 
     GestureRecognizer recognizer;
-    Vector3 currentlyNavigatingDirection = Vector3.zero;
 
     void Start()
     {
@@ -48,18 +47,18 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
     {
         if (Globals.Instance.SelectedBlock != null)
         {
-            if (currentlyNavigatingDirection == Vector3.zero)
+            if (Globals.CurrentlyNavigatingDirection == Vector3.zero)
             {
                 // try locking navigation direction if not yet locked
                 if (TryLockNavigationDirection(normalizedOffset))
                 {
-                    Globals.Instance.SelectedBlock.SendMessageUpwards("OnRotateRelativeInit", currentlyNavigatingDirection);
+                    SendMessageToSelectedBlocks("OnRotateRelativeInit");
                 }
             }
             else
             {
                 // rotate block relative to navigation offset
-                Globals.Instance.SelectedBlock.SendMessageUpwards("OnRotateRelative", Vector3.Scale(normalizedOffset, currentlyNavigatingDirection));
+                SendMessageToSelectedBlocks("OnRotateRelative", Vector3.Scale(normalizedOffset, Globals.CurrentlyNavigatingDirection));
             }
         }
     }
@@ -79,16 +78,16 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
             if (Mathf.Abs(relativePosition.x) >= Mathf.Abs(relativePosition.y)
                 && Mathf.Abs(relativePosition.x) >= Mathf.Abs(relativePosition.z))
             {
-                currentlyNavigatingDirection = Vector3.left; // was (1, 0, 0)
+                Globals.CurrentlyNavigatingDirection = Vector3.left; // was (1, 0, 0)
             }
             else if (Mathf.Abs(relativePosition.y) >= Mathf.Abs(relativePosition.x) 
                 && Mathf.Abs(relativePosition.y) >= Mathf.Abs(relativePosition.z))
             {
-                currentlyNavigatingDirection = Vector3.up; // was (0, 1, 0)
+                Globals.CurrentlyNavigatingDirection = Vector3.up; // was (0, 1, 0)
             }
             else
             {
-                currentlyNavigatingDirection = Vector3.forward; // was (0, 0, 1)
+                Globals.CurrentlyNavigatingDirection = Vector3.forward; // was (0, 0, 1)
             }
             return true;
         }
@@ -115,11 +114,11 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
     void EndNavigation(Vector3 relativePosition)
     {
         Globals.CurrentlyNavigating = false;
-        currentlyNavigatingDirection = Vector3.zero;
+        Globals.CurrentlyNavigatingDirection = Vector3.zero;
 
         // Send a message to the selected object and its ancestors
         // to finish the rotation
-        Globals.Instance.SelectedBlock.SendMessageUpwards("OnRotateRelativeSnap", relativePosition);
+        SendMessageToSelectedBlocks("OnRotateRelativeSnap", relativePosition);
     }
 
     void OnTapped(InteractionSourceKind source, int tapCount, Ray headRay)
@@ -140,27 +139,29 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
     public void OnSpeechKeywordRecognized(SpeechKeywordRecognizedEventData eventData)
     {
         string keyWords = eventData.RecognizedText.ToLower();
+        var blockIOscript = (BlockIO)this.gameObject.GetComponent(typeof(BlockIO));
+
         if (Globals.Instance.SelectedBlock != null)
         {
             switch (keyWords)
             {
                 case "left":
-                    Globals.Instance.SelectedBlock.SendMessage("OnTurnLeft");
+                    SendMessageToSelectedBlocks("OnTurnLeft");
                     break;
                 case "right":
-                    Globals.Instance.SelectedBlock.SendMessage("OnTurnRight");
+                    SendMessageToSelectedBlocks("OnTurnRight");
                     break;
                 case "up":
-                    Globals.Instance.SelectedBlock.SendMessage("OnTurnUp");
+                    SendMessageToSelectedBlocks("OnTurnUp");
                    break;
                 case "down":
-                    Globals.Instance.SelectedBlock.SendMessage("OnTurnDown");
+                    SendMessageToSelectedBlocks("OnTurnDown");
                     break;
                 case "turn":
-                    Globals.Instance.SelectedBlock.SendMessage("OnRotate");
+                    SendMessageToSelectedBlocks("OnRotate");
                     break;
                 case "flip":
-                    Globals.Instance.SelectedBlock.SendMessage("OnFlip");
+                    SendMessageToSelectedBlocks("OnFlip");
                     break;
                 case "release":
                     Globals.Instance.SelectedBlock.SendMessage("OnUnselect");
@@ -174,7 +175,16 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
             switch (keyWords)
             {
                 case "select":
-                    Globals.Instance.FocusedObject.SendMessage("OnSelect");
+                    Globals.Instance.FocusedObject.SendMessage("OnSelect", Globals.SelectionType.Block);
+                    break;
+                case "select column":
+                    Globals.Instance.FocusedObject.SendMessage("OnSelect", Globals.SelectionType.Column);
+                    break;
+                case "select row":
+                    Globals.Instance.FocusedObject.SendMessage("OnSelect", Globals.SelectionType.Row);
+                    break;
+                case "select all":
+                    Globals.Instance.FocusedObject.SendMessage("OnSelect", Globals.SelectionType.All);
                     break;
                 default:
                     break;
@@ -212,6 +222,83 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
             default:
                 break;
         }
+    }
+
+    private void SendMessageToSelectedBlocks(string Message)
+    {
+        SendMessageToSelectedBlocks(Message, null);
+    }
+
+    private void SendMessageToSelectedBlocks(string Message, object Param)
+    {
+        if (Globals.Instance.SelectionMode == Globals.SelectionType.Block)
+        {
+            Globals.Instance.SelectedBlock.SendMessage(Message, Param);
+        }
+        else
+        {
+            // find out index # of the selected block
+            int selectedBlockIndex = getBlockIndex(Globals.Instance.SelectedBlock);
+
+            Transform gridTransform = Globals.Instance.SelectedBlock.transform.parent;
+
+            // cache grid width/height
+            var blockIOscript = (BlockIO)gridTransform.parent.gameObject.GetComponent(typeof(BlockIO));
+            int gridWidth = 0;
+            int gridHeight = 0;
+
+#if !UNITY_EDITOR
+            gridWidth = blockIOscript.GetBlockGridSize().width;
+            gridHeight = blockIOscript.GetBlockGridSize().height;
+#endif
+
+            if (selectedBlockIndex > 0 && gridHeight > 0 && gridWidth > 0)
+            {
+                // calculate index range for the full list of selected objects
+
+                switch (Globals.Instance.SelectionMode)
+                {
+                    case Globals.SelectionType.Column:
+                        int selectedColumnIndex = Mathf.FloorToInt(selectedBlockIndex / gridHeight);
+                        for (int i = selectedColumnIndex * gridHeight; i < (selectedColumnIndex + 1) * gridHeight; i++)
+                        {
+                            gridTransform.GetChild(i).SendMessage(Message, Param);
+                        }
+                        break;
+                    case Globals.SelectionType.Row:
+                        int selectedRowIndex = Mathf.FloorToInt(selectedBlockIndex % gridWidth);
+                        for (int j = 0; j < gridWidth; j++)
+                        {
+                            gridTransform.GetChild(selectedRowIndex + j * gridHeight).SendMessage(Message, Param);
+                        }
+                        break;
+                    case Globals.SelectionType.All:
+                        for (int i = 0; i < gridHeight * gridWidth; i++)
+                        {
+                            gridTransform.GetChild(i).SendMessage(Message, Param);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    private int getBlockIndex(GameObject block)
+    {
+        Transform gridTransform = Globals.Instance.SelectedBlock.transform.parent;
+        if (gridTransform != null)
+        {
+            for (int i = 0; i < gridTransform.childCount; i++)
+            {
+                if (gridTransform.GetChild(i).gameObject == Globals.Instance.SelectedBlock)
+                {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
 }

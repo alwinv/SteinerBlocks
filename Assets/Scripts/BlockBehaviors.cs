@@ -120,6 +120,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         {
             // show selection highlight around the block
             Globals.Instance.SelectionHighlight.SendMessage("OnFocus", this.gameObject);
+            Globals.Instance.FocusedObject = this.gameObject;
 
             // move the block up off the matrix plane
             AnimationTargetPosition = new Vector3(
@@ -140,6 +141,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         {
             // hide selection highlight
             Globals.Instance.SelectionHighlight.SendMessage("OnFocusLost", this.gameObject);
+            Globals.Instance.FocusedObject = null;
 
             // move the block up back down to the matrix plane
             AnimationTargetPosition = originalLocalPosition;
@@ -148,7 +150,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
         }
     }
 
-    public void OnSelect()
+    public void OnSelect(Globals.SelectionType SelectionMode)
     {
         // todo: does this need to be conditioned to only happen when not dragging?
         // !this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().IsDraggingEnabled
@@ -159,6 +161,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
             this.gameObject.transform.parent.parent.gameObject.GetComponent<HandDraggable>().enabled = false;
 
             Globals.Instance.SelectedBlock = this.gameObject;
+            Globals.Instance.SelectionMode = SelectionMode;
 
             // move the block up off the matrix plane
             AnimationTargetPosition = new Vector3(
@@ -215,7 +218,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
             if(Globals.Instance.SelectedBlock != null)
                 Globals.Instance.SelectedBlock.SendMessage("OnUnselect");
             else
-               this.OnSelect();
+               this.OnSelect(Globals.SelectionType.Block);
         }
     }
 
@@ -226,7 +229,7 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
     // handlers for navigation 
     //
 
-    void OnRotateRelativeInit(Vector3 navDirection)
+    void OnRotateRelativeInit()
     {
         // calculate and store transform for "front" of block relative to user's head position
         initFrontFace_transform();
@@ -241,12 +244,12 @@ public class BlockBehaviors : MonoBehaviour, IFocusable, IInputClickHandler
 
         // clone the camera, as a child of the block world transform
         var tempTransform = new GameObject().transform;
-        tempTransform.SetParent(this.transform.parent);
+        tempTransform.SetParent(Globals.Instance.SelectedBlock.transform.parent);
         tempTransform.rotation = navStart_gazeRotation;
         tempTransform.position = navStart_headPosition;
 
         //// rotate cloned camera to look at the selected block
-        tempTransform.LookAt(this.transform, Camera.main.transform.up);
+        tempTransform.LookAt(Globals.Instance.SelectedBlock.transform, Camera.main.transform.up);
 
         // find closest 90 deg local rotation angles for the cloned camera 
         Vector3 SnapAngles;

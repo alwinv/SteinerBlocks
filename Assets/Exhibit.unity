@@ -591,7 +591,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ClientRole: 0
-  ServerAddress: 192.168.0.30
+  ServerAddress: 10.83.235.195
   ServerPort: 20602
   connectOnAwake: 1
   AutoDiscoverServer: 0
@@ -730,6 +730,12 @@ MonoBehaviour:
   - Keyword: Pause
     KeyCode: 0
   - Keyword: Resume
+    KeyCode: 0
+  - Keyword: Select Column
+    KeyCode: 0
+  - Keyword: Select Row
+    KeyCode: 0
+  - Keyword: Select All
     KeyCode: 0
 --- !u!1 &789361041
 GameObject:
