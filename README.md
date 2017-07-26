@@ -1,3 +1,4 @@
+
 # SteinerBlocks
 This mixed-reality art exhibit for HoloLens, is based on Curtis Steiner's 1,000 Blocks, which is part of the Seattle Art Museum's permanent collection.
 
@@ -37,3 +38,6 @@ How to rotate the selected block:
 - up-down
 - left-right
 - in-out
+
+# Privacy Policy
+The Steiner Blocks application does not access or transmit any personal information
