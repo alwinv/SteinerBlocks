@@ -266,7 +266,7 @@ public class TappedHandler : MonoBehaviour, ISpeechHandler
                         }
                         break;
                     case Globals.SelectionType.Row:
-                        int selectedRowIndex = Mathf.FloorToInt(selectedBlockIndex % gridWidth);
+                        int selectedRowIndex = Mathf.FloorToInt(selectedBlockIndex % gridHeight);
                         for (int j = 0; j < gridWidth; j++)
                         {
                             gridTransform.GetChild(selectedRowIndex + j * gridHeight).SendMessage(Message, Param);
