@@ -53,9 +53,6 @@ public class BlockIO : MonoBehaviour {
     void OnLoadFile_ForSharing (string fileName)
     {
         createBlocksFromFile(fileName, true);
-
-        // scale up a bit
-        this.transform.localScale = this.transform.localScale * scaleFactor;
     }
 
     void OnSaveFile_ForLocal()
@@ -70,8 +67,8 @@ public class BlockIO : MonoBehaviour {
         // detect how many blocks wide and high the grid is
         // todo: 1000 should be replaced by blocks_grid.ChildCount to support arbitrary grid sizes
         // todo: but there are 2x the expected children in the grids somehow, so it's failing
-        int width = blocksList.width; //50; 
-        int height = blocksList.height; //20;
+        int width = blocksList.width;
+        int height = blocksList.height;
 
         // create a 2D grid to place the GameObjects in
         GameObject[,] blocksGameObjectList2D = new GameObject[width, height];
@@ -97,6 +94,7 @@ public class BlockIO : MonoBehaviour {
     {
         if (blocksList != null)
         {
+            //todo: for shared experience - need different way to calculate this
             return new Globals.size(blocksList.width, blocksList.height);
         }
         else

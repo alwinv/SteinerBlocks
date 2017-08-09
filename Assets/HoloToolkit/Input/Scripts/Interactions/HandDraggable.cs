@@ -3,6 +3,7 @@
 
 using UnityEngine;
 using System;
+using UnityEngine.VR.WSA;
 
 namespace HoloToolkit.Unity.InputModule
 {
@@ -150,6 +151,9 @@ namespace HoloToolkit.Unity.InputModule
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
             draggingPosition = gazeHitPosition;
 
+            // destroy existing anchor
+            DestroyImmediate(this.gameObject.GetComponent<WorldAnchor>());
+
             StartedDragging.RaiseEvent();
         }
 
@@ -249,6 +253,9 @@ namespace HoloToolkit.Unity.InputModule
             isDragging = false;
             currentInputSource = null;
             StoppedDragging.RaiseEvent();
+
+            // Restore the world anchor
+            SendMessageUpwards("OnAddAnchor", this.gameObject);
         }
 
         public void OnFocusEnter()

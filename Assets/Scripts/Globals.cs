@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.VR.WSA;
+using UnityEngine.VR.WSA.Persistence;
 
 public class Globals : MonoBehaviour {
     // instance variable so its globals can be referenced from other scripts
@@ -12,6 +14,7 @@ public class Globals : MonoBehaviour {
     public GameObject LocalBlocks_Parent;
     public GameObject SharedBlocks_Parent;
     public GameObject SelectionHighlight;
+    WorldAnchorStore anchorStore;
 
     // The cube that is currently being edited
     public GameObject SelectedBlock { get; set; }
@@ -49,10 +52,15 @@ public class Globals : MonoBehaviour {
 
     // use this for random #s elsewhere in the app
     public System.Random rnd1 = new System.Random(System.DateTime.Now.Millisecond);
+    WorldAnchor anchor;
+
 
     // Use this for initialization
     IEnumerator Start () {
         Instance = this;
+
+        SharedBlocks_Parent.transform.localScale = this.transform.localScale * 2;
+
 
         // load slide show grid hidden & not running
         OnLoadSlideShow();
@@ -184,5 +192,66 @@ public class Globals : MonoBehaviour {
                 "091.blocks"};
         SlideShowBlocks_Parent.SendMessage("OnLoadFiles_ForSlideShow", fileNames);
         timeSinceLastSlide = 0.0f;
+    }
+
+    void AnchorStoreReady(WorldAnchorStore store)
+    {
+        anchorStore = store;
+
+        string[] ids = anchorStore.GetAllIds();
+        for (int index = 0; index < ids.Length; index++)
+        {
+            if(ids[index]==LocalBlocks_Parent.name)
+            {
+                WorldAnchor wa = anchorStore.Load(ids[index],LocalBlocks_Parent);
+            }
+            if (ids[index] == SlideShowBlocks_Parent.name)
+            {
+                WorldAnchor wa = anchorStore.Load(ids[index], SlideShowBlocks_Parent);
+            }
+        }
+    }
+
+    void OnPersistAnchor(GameObject blocksParent)
+    {
+        string[] ids = anchorStore.GetAllIds();
+        WorldAnchor wa = blocksParent.GetComponent<WorldAnchor>();
+        if (wa != null)
+        {
+            for (int index = 0; index < ids.Length; index++)
+            {
+                if (ids[index] == blocksParent.name)
+                {
+                    bool deleted = anchorStore.Delete(blocksParent.name);
+                    if (!deleted)
+                        Debug.Assert(true, "Delete Anchor failed for: " + blocksParent);
+                    break;
+                }
+            }
+            bool saved = anchorStore.Save(blocksParent.name, wa);
+            if (!saved)
+                Debug.Assert(true, "Save Anchor failed for: " + blocksParent);
+        }
+    }
+
+    void OnAddAnchor(GameObject blocksParent)
+    {
+        // set the world anchor to keep it in place
+        anchor = blocksParent.AddComponent<WorldAnchor>();
+        if (anchor != null)
+        {
+            anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
+            if (anchor.isLocated)
+                Anchor_OnTrackingChanged(anchor, anchor.isLocated);
+        }
+
+    }
+
+    private void Anchor_OnTrackingChanged(WorldAnchor self, bool located)
+    {
+        if (located)
+        {
+            OnPersistAnchor(this.gameObject);
+        }
     }
 }

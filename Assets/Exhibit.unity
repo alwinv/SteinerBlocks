@@ -541,6 +541,7 @@ GameObject:
   - component: {fileID: 746836555}
   - component: {fileID: 746836554}
   - component: {fileID: 746836557}
+  - component: {fileID: 746836558}
   m_Layer: 0
   m_Name: Room
   m_TagString: Untagged
@@ -591,7 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ClientRole: 0
-  ServerAddress: 10.83.235.195
+  ServerAddress: 10.83.234.65
   ServerPort: 20602
   connectOnAwake: 1
   AutoDiscoverServer: 0
@@ -737,6 +738,32 @@ MonoBehaviour:
     KeyCode: 0
   - Keyword: Select All
     KeyCode: 0
+  - Keyword: Unlock
+    KeyCode: 0
+  - Keyword: Lock
+    KeyCode: 0
+--- !u!114 &746836558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 746836547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -594688902, guid: f7b54ff4a43d4fcf81b4538b678e0bcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SurfaceParent: {fileID: 0}
+  m_FreezeUpdates: 0
+  m_VolumeType: 1
+  m_SphereRadius: 2
+  m_HalfBoxExtents: {x: 4, y: 4, z: 4}
+  m_LodType: 1
+  m_NumUpdatesBeforeRemoval: 10
+  m_SecondsBetweenUpdates: 2.5
+  m_CurrentRenderState: 1
+  m_VisualMaterial: {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  m_OcclusionMaterial: {fileID: 15302, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &789361041
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,7 +919,8 @@ Prefab:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114301554385089992, guid: 8ddf559951f99f549aa1d10eccbf54fb, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 8ddf559951f99f549aa1d10eccbf54fb, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &952495019
@@ -921,7 +949,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 952495019}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.25, z: 3}
+  m_LocalPosition: {x: -0.4, y: -0.15, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1866800484}
@@ -969,7 +997,7 @@ MonoBehaviour:
   block_prefab: {fileID: 1000013769219478, guid: 8ddf559951f99f549aa1d10eccbf54fb,
     type: 2}
   blocks_grid: {fileID: 1866800483}
-  scaleFactor: 1.5
+  scaleFactor: 2
 --- !u!114 &952495024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1012,7 +1040,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1095756242}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0046, y: -0.1118, z: 0}
+  m_LocalPosition: {x: 0.0046, y: -0.18, z: 0}
   m_LocalScale: {x: 0.10911526, y: 0.10683645, z: 0.001}
   m_Children: []
   m_Father: {fileID: 2084685285}
@@ -1092,7 +1120,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1253498898}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0448, y: -0.0688, z: -0.003}
+  m_LocalPosition: {x: -0.0448, y: -0.137, z: -0.003}
   m_LocalScale: {x: 0.0025, y: 0.0025, z: 0.001}
   m_Children: []
   m_Father: {fileID: 2084685285}
@@ -1107,7 +1135,7 @@ TextMesh:
   m_GameObject: {fileID: 1253498898}
   m_Text: "Welcome to Steiner Blocks\nvirtual, interactive exhibit.\r\n\nThis experience
     is based on \r\nCurtis Steiner's 1,000 Blocks, \r\nwhich is part of the Seattle
-    Art \r\nMuseum's permanent collection.\r\n\n\n\n\nAudio: http://www.bensound.com"
+    Art \r\nMuseum's permanent collection.\r\n\n\n\n\nmusic from http://www.bensound.com"
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -1290,7 +1318,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1655391316}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.4, y: -0.15, z: 2}
+  m_LocalPosition: {x: -0.8, y: -0.15, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2543054}
@@ -1938,6 +1966,11 @@ Prefab:
         type: 2}
       propertyPath: m_Text
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 23725207649169752, guid: a8b892e5dd7377442a7006e1384437c8,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a8b892e5dd7377442a7006e1384437c8, type: 2}

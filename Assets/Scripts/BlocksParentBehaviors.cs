@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using HoloToolkit.Unity.InputModule;
-using System;
+﻿using UnityEngine;
 
 public class BlocksParentBehaviors : MonoBehaviour {
 
@@ -67,5 +63,4 @@ public class BlocksParentBehaviors : MonoBehaviour {
         // restore default editable state
         IsEditable = defaultEditable;
     }
-
 }
