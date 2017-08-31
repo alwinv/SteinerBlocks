@@ -41,9 +41,6 @@ Say one of these directions to rotate the block in that direction:
 - left-right
 - forwards-backwards
 
-# Privacy Policy
-The Steiner Blocks application does not access or transmit any personal information
-
 ## 3. Put the block back:
 
 ### Use verbal commands:
@@ -51,3 +48,6 @@ The Steiner Blocks application does not access or transmit any personal informat
 
 ### Use HoloLens gestures:
 - Air-tap
+
+# Privacy Policy
+The Steiner Blocks application does not access or transmit any personal information
