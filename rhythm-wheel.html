@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wheel of Rhythms</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  background-color: #0d0902;
+  background-image:
+    radial-gradient(ellipse at 25% 35%, rgba(90,55,10,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 75%, rgba(50,30,5,0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 20%, rgba(30,20,5,0.15) 0%, transparent 40%);
+  color: #c8a870;
+  font-family: 'Cinzel', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px 10px;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+h1 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: #b89050;
+  text-shadow: 0 1px 12px rgba(180,140,60,0.35), 0 -1px 0 rgba(0,0,0,0.8);
+}
+
+.subtitle {
+  font-size: 0.5rem;
+  letter-spacing: 5px;
+  color: #5a4020;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+#canvas {
+  cursor: crosshair;
+  display: block;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px #1a1206,
+    0 0 0 6px #3e2c14,
+    0 0 0 9px #1a1206,
+    0 0 0 11px #5a4220,
+    0 0 0 13px #1a1206,
+    0 12px 40px rgba(0,0,0,0.9),
+    0 4px 16px rgba(0,0,0,0.7);
+}
+
+.panel {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.slab {
+  background:
+    linear-gradient(160deg, #2a1e0e 0%, #1c1408 45%, #231a0c 100%);
+  border: 1px solid #3e2c14;
+  border-top-color: #5a4020;
+  border-radius: 2px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(160,120,50,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.4),
+    0 3px 10px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+/* Worn wood grain lines on slabs */
+.slab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      175deg,
+      transparent 0px,
+      transparent 6px,
+      rgba(0,0,0,0.06) 6px,
+      rgba(0,0,0,0.06) 7px
+    );
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.slab-label {
+  font-size: 0.48rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #5a4020;
+  position: relative;
+}
+
+.pitch-row { display: flex; gap: 5px; }
+
+.pitch-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 2px;
+  border: 1px solid rgba(120,80,30,0.35);
+  cursor: pointer;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.pitch-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,240,200,0.12) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.pitch-btn.sel {
+  border-color: #c8a030;
+  box-shadow: 0 0 10px currentColor, inset 0 0 6px rgba(255,220,100,0.08);
+}
+
+.row { display: flex; align-items: center; gap: 10px; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100px; height: 3px;
+  background: linear-gradient(90deg, #3e2808, #7a5518);
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px; height: 15px;
+  border-radius: 2px;
+  background: radial-gradient(circle at 35% 35%, #e0b050, #7a5010);
+  cursor: pointer;
+  border: 1px solid #4a3010;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.val {
+  font-size: 0.75rem;
+  color: #7a5830;
+  min-width: 32px;
+  text-align: right;
+}
+
+.step-row { display: flex; gap: 3px; }
+
+.step-btn {
+  padding: 5px 9px;
+  background: #140f06;
+  border: 1px solid #2e2010;
+  color: #4a3820;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.6rem;
+  transition: all 0.15s;
+}
+
+.step-btn.sel {
+  background: #231a0c;
+  border-color: #7a5818;
+  color: #b08828;
+}
+
+.ancient-btn {
+  padding: 8px 18px;
+  background: linear-gradient(180deg, #2e2010, #140f06);
+  border: 1px solid #3e2c10;
+  border-top-color: #5a4020;
+  color: #6a4820;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  box-shadow: inset 0 1px 0 rgba(160,110,40,0.1);
+}
+
+.ancient-btn:hover { border-color: #7a5820; color: #a07828; }
+
+.placard {
+  margin-top: 16px;
+  text-align: center;
+  padding: 10px 20px;
+  border: 1px solid #2e2010;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #1c1508, #14100a);
+  max-width: 540px;
+  box-shadow: inset 0 1px 0 rgba(100,70,20,0.08);
+}
+
+.placard-ref {
+  font-size: 0.48rem;
+  letter-spacing: 3px;
+  color: #4a3420;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.placard-desc {
+  font-size: 0.5rem;
+  color: #3a2818;
+  letter-spacing: 2px;
+}
+
+.hint {
+  font-size: 0.48rem;
+  color: #3a2a14;
+  letter-spacing: 2px;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Wheel of Rhythms</h1>
+  <div class="subtitle">طارة الإيقاع &nbsp;·&nbsp; Touch the ring to place a bell</div>
+</header>
+
+<canvas id="canvas" width="520" height="520"></canvas>
+
+<div class="panel">
+  <div class="slab">
+    <div class="slab-label">Tone</div>
+    <div class="pitch-row" id="pitchRow"></div>
+  </div>
+  <div class="slab">
+    <div class="slab-label">Tempo</div>
+    <div class="row">
+      <input type="range" id="bpmRange" min="40" max="220" value="90">
+      <span class="val" id="bpmVal">90</span>
+    </div>
+  </div>
+  <div class="slab">
+    <div class="slab-label">Divisions</div>
+    <div class="step-row" id="stepRow">
+      <button class="step-btn" data-n="8">VIII</button>
+      <button class="step-btn sel" data-n="16">XVI</button>
+      <button class="step-btn" data-n="32">XXXII</button>
+    </div>
+  </div>
+  <div class="slab">
+    <div class="slab-label">&nbsp;</div>
+    <button class="ancient-btn" id="clearBtn">Clear</button>
+  </div>
+</div>
+
+<div class="placard">
+  <span class="placard-ref">Artifact No. 1847-C &nbsp;·&nbsp; Circa 3rd Century BCE &nbsp;·&nbsp; Mesopotamia</span>
+  <span class="placard-desc">Rotating percussion wheel of cast bronze and carved limestone. Bells of graduated pitch fixed to the outer ring produce rhythmic patterns as the iron hand sweeps through each revolution.</span>
+</div>
+
+<div class="hint">Click a bell to remove · Right-click to change tone</div>
+
+<script>
+// ── Pitch definitions (ancient metals) ───────────────────────────────────────
+const PITCHES = [
+  { label: 'I',   freq: 390,  color: '#4a8a68', light: '#6aaa88', dark: '#223c30', glow: 'rgba(74,138,104,0.7)'  },
+  { label: 'II',  freq: 585,  color: '#c07835', light: '#e09855', dark: '#6a3e18', glow: 'rgba(192,120,53,0.7)'  },
+  { label: 'III', freq: 878,  color: '#d49530', light: '#f4b550', dark: '#7a5218', glow: 'rgba(212,149,48,0.7)'  },
+  { label: 'IV',  freq: 1317, color: '#c8b060', light: '#e8d080', dark: '#7a6828', glow: 'rgba(200,176,96,0.7)'  },
+];
+
+// ── Canvas setup ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const CX = W / 2, CY = H / 2;
+
+const RING_R = 200;
+const SNAP_R = 30;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let audioCtx       = null;
+let bpm            = 90;
+let steps          = 16;
+let selectedPitch  = 1;
+let bells          = [];   // { step, pitch, hitAt }
+let angle          = -Math.PI / 2;  // arm angle, starts at 12 o'clock
+let lastAngle      = angle;
+let lastTime       = null;
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playCowbell(pitchIdx) {
+  const ac  = ensureAudio();
+  const now = ac.currentTime;
+  const f   = PITCHES[pitchIdx].freq;
+
+  // Classic metallic bell: two detuned square oscillators through bandpass
+  const osc1 = ac.createOscillator();
+  const osc2 = ac.createOscillator();
+  osc1.type = 'square'; osc1.frequency.value = f;
+  osc2.type = 'square'; osc2.frequency.value = f * 1.4962;
+
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass'; bp.frequency.value = f * 1.1; bp.Q.value = 1.5;
+
+  const hp = ac.createBiquadFilter();
+  hp.type = 'highpass'; hp.frequency.value = f * 0.55;
+
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0.4, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+
+  osc1.connect(bp); osc2.connect(bp);
+  bp.connect(hp); hp.connect(gain); gain.connect(ac.destination);
+
+  osc1.start(now); osc2.start(now);
+  osc1.stop(now + 0.56); osc2.stop(now + 0.56);
+}
+
+// ── Geometry helpers ──────────────────────────────────────────────────────────
+function stepAngle(s) {
+  return -Math.PI / 2 + (s / steps) * Math.PI * 2;
+}
+
+function angleToStep(a) {
+  const n = ((a + Math.PI / 2) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+  return Math.round(n / (Math.PI * 2) * steps) % steps;
+}
+
+function norm(a) { return ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2); }
+
+function didPass(from, to, target) {
+  const f     = norm(from);
+  const g     = norm(target);
+  const delta = norm(to - from);
+  const diff  = norm(g - f);
+  return diff > 0 && diff <= delta;
+}
+
+// ── Drawing: background ───────────────────────────────────────────────────────
+function drawBg() {
+  ctx.fillStyle = '#0d0902';
+  ctx.fillRect(0, 0, W, H);
+
+  // Warm stone radial glow
+  const rg = ctx.createRadialGradient(CX - 40, CY - 40, 0, CX, CY, RING_R * 1.6);
+  rg.addColorStop(0, 'rgba(70,45,10,0.14)');
+  rg.addColorStop(0.6, 'rgba(30,20,5,0.1)');
+  rg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = rg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Simulate rough stone texture: faint horizontal grain
+  ctx.save();
+  ctx.globalAlpha = 0.025;
+  for (let y = 0; y < H; y += 5) {
+    const v = (y / 5 % 3 === 1) ? 1 : 0;
+    ctx.fillStyle = v ? '#9a7840' : '#2a1e0a';
+    ctx.fillRect(0, y, W, 2);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+// ── Drawing: carved stone inner disk ─────────────────────────────────────────
+function drawInnerDisk() {
+  const innerR = RING_R - 18;
+
+  // Stone base fill
+  const sg = ctx.createRadialGradient(CX - 50, CY - 50, 0, CX, CY, innerR * 1.1);
+  sg.addColorStop(0,   '#241a0c');
+  sg.addColorStop(0.5, '#1a1208');
+  sg.addColorStop(1,   '#110d06');
+  ctx.beginPath();
+  ctx.arc(CX, CY, innerR, 0, Math.PI * 2);
+  ctx.fillStyle = sg;
+  ctx.fill();
+
+  // Ancient stone crack lines (fixed "random" positions)
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.strokeStyle = '#d0a050';
+  ctx.lineWidth = 0.8;
+  const cracks = [
+    [[CX - 60, CY - 90], [CX + 15, CY - 35], [CX + 70, CY + 38]],
+    [[CX + 55, CY - 65], [CX - 8,  CY + 18], [CX - 62, CY + 72]],
+    [[CX - 75, CY + 28], [CX + 12, CY - 8]],
+    [[CX + 30, CY + 55], [CX - 20, CY + 90]],
+  ];
+  for (const crack of cracks) {
+    ctx.beginPath();
+    ctx.moveTo(crack[0][0], crack[0][1]);
+    for (let i = 1; i < crack.length; i++) ctx.lineTo(crack[i][0], crack[i][1]);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  // Inner decorative rings (inscribed circles)
+  const deco = [innerR * 0.72, innerR * 0.44, innerR * 0.2];
+  deco.forEach((r, i) => {
+    ctx.beginPath();
+    ctx.arc(CX, CY, r, 0, Math.PI * 2);
+    ctx.strokeStyle = i === 0 ? '#3a2a16' : '#2a1e0e';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Islamic geometric: 8-pointed star at center
+  drawStar(CX, CY, 22, 10, 8, '#3a2a14', '#2a1a0a');
+
+  // Radial spokes from inner ring to small center (astrolabe-style)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.strokeStyle = '#8a6030';
+  ctx.lineWidth = 0.6;
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(CX + 26 * Math.cos(a), CY + 26 * Math.sin(a));
+    ctx.lineTo(CX + deco[0] * Math.cos(a), CY + deco[0] * Math.sin(a));
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawStar(x, y, outerR, innerR, points, fill, stroke) {
+  ctx.beginPath();
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+    if (i === 0) ctx.moveTo(x + r * Math.cos(a), y + r * Math.sin(a));
+    else         ctx.lineTo(x + r * Math.cos(a), y + r * Math.sin(a));
+  }
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+}
+
+// ── Drawing: the carved stone ring ───────────────────────────────────────────
+function drawRing() {
+  // Wide stone band
+  ctx.beginPath();
+  ctx.arc(CX, CY, RING_R, 0, Math.PI * 2);
+  ctx.strokeStyle = '#4a3820';
+  ctx.lineWidth = 28;
+  ctx.stroke();
+
+  // Stone gradient overlay on the band
+  for (let w = 14; w >= 1; w--) {
+    const t = (14 - w) / 13;
+    const lightness = Math.round(40 + t * 20);
+    const r = Math.round(70 - t * 25);
+    const g = Math.round(52 - t * 18);
+    const b = Math.round(28 - t * 10);
+    ctx.beginPath();
+    ctx.arc(CX, CY, RING_R - 14 + w, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.6)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Carved inner edge (shadow)
+  ctx.beginPath();
+  ctx.arc(CX, CY, RING_R - 14, 0, Math.PI * 2);
+  ctx.strokeStyle = '#1a1208';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Worn highlight on outer edge
+  ctx.beginPath();
+  ctx.arc(CX, CY, RING_R + 12, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(120,90,40,0.25)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Decorative interlaced arc pattern (ancient Islamic geometry)
+  ctx.save();
+  ctx.globalAlpha = 0.12;
+  ctx.strokeStyle = '#c8a050';
+  ctx.lineWidth = 0.8;
+  const nArcs = 12;
+  for (let i = 0; i < nArcs; i++) {
+    const a1 = (i / nArcs) * Math.PI * 2;
+    const a2 = ((i + 0.5) / nArcs) * Math.PI * 2;
+    const mx = CX + RING_R * Math.cos(a2);
+    const my = CY + RING_R * Math.sin(a2);
+    const r  = RING_R * Math.sin(Math.PI / nArcs);
+    ctx.beginPath();
+    ctx.arc(mx, my, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  // Tick marks (chiseled into stone)
+  for (let i = 0; i < steps; i++) {
+    const a    = stepAngle(i);
+    const beat = i % (steps / 4) === 0;
+
+    if (beat) {
+      // Diamond at the quarter-beat positions
+      const sr = RING_R;
+      const sx = CX + sr * Math.cos(a);
+      const sy = CY + sr * Math.sin(a);
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(a + Math.PI / 4);
+
+      // Engraved shadow
+      ctx.fillStyle = '#1a1208';
+      ctx.beginPath();
+      ctx.moveTo(0, -7.5); ctx.lineTo(4.5, 0);
+      ctx.lineTo(0, 7.5); ctx.lineTo(-4.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Stone raised surface
+      ctx.fillStyle = '#7a6038';
+      ctx.beginPath();
+      ctx.moveTo(-0.5, -7); ctx.lineTo(4, 0);
+      ctx.lineTo(-0.5, 7); ctx.lineTo(-4.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    } else {
+      // Chiseled notch
+      const ir = RING_R - 8;
+      const or = RING_R + 8;
+      // Shadow edge
+      ctx.beginPath();
+      ctx.moveTo(CX + ir * Math.cos(a), CY + ir * Math.sin(a));
+      ctx.lineTo(CX + or * Math.cos(a), CY + or * Math.sin(a));
+      ctx.strokeStyle = '#1a1208';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Highlight edge (worn groove)
+      const off = 0.012;
+      ctx.beginPath();
+      ctx.moveTo(CX + ir * Math.cos(a + off), CY + ir * Math.sin(a + off));
+      ctx.lineTo(CX + or * Math.cos(a + off), CY + or * Math.sin(a + off));
+      ctx.strokeStyle = 'rgba(160,110,50,0.2)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+}
+
+// ── Drawing: ancient bronze bell ─────────────────────────────────────────────
+function drawBellAt(bell, now) {
+  const a      = stepAngle(bell.step);
+  const bx     = CX + RING_R * Math.cos(a);
+  const by     = CY + RING_R * Math.sin(a);
+  const p      = PITCHES[bell.pitch];
+  const glowing = bell.hitAt && (now - bell.hitAt < 210);
+  const gPulse  = glowing ? Math.max(0, 1 - (now - bell.hitAt) / 210) : 0;
+
+  ctx.save();
+  ctx.translate(bx, by);
+  // Rotate so bell opening faces center (local -y = toward center)
+  ctx.rotate(Math.PI / 2 - a);
+
+  if (glowing) {
+    ctx.shadowColor = p.glow;
+    ctx.shadowBlur  = 20 + gPulse * 14;
+  }
+
+  // Bell gradient: metallic with patina
+  const bg = ctx.createLinearGradient(-13, -18, 13, 17);
+  if (glowing) {
+    bg.addColorStop(0,    '#f8f0c0');
+    bg.addColorStop(0.25, p.light);
+    bg.addColorStop(0.65, p.color);
+    bg.addColorStop(1,    p.dark);
+  } else {
+    bg.addColorStop(0,    p.light);
+    bg.addColorStop(0.3,  p.color);
+    bg.addColorStop(0.7,  p.dark);
+    bg.addColorStop(1,    '#1a1208');
+  }
+
+  // Bell body: bulbous ancient profile
+  // Opening at top (local -y, toward center), mount at bottom (local +y, outward)
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  ctx.arc(0, -16, 9, Math.PI, 0, false);     // mouth opening arc
+  ctx.bezierCurveTo(14, -10, 15,  1, 12,  9); // right side swelling
+  ctx.bezierCurveTo(10,  14,  5, 17,  0, 17); // base curve right
+  ctx.bezierCurveTo(-5,  17,-10, 14,-12,  9); // base curve left
+  ctx.bezierCurveTo(-15,  1,-14,-10, -9,-16); // left side swelling
+  ctx.closePath();
+  ctx.fill();
+
+  // Engraved band around the belly
+  ctx.strokeStyle = glowing ? 'rgba(255,220,100,0.5)' : 'rgba(0,0,0,0.5)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(0, -1, 13, 5, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Second engraved band (ancient decoration)
+  ctx.strokeStyle = glowing ? 'rgba(255,200,80,0.25)' : 'rgba(0,0,0,0.3)';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.ellipse(0, 7, 10, 3.5, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Worn specular highlight on left edge
+  ctx.fillStyle = 'rgba(255,250,210,0.14)';
+  ctx.beginPath();
+  ctx.ellipse(-6, -6, 2.5, 9, -0.25, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Aged patina spots (verdigris / corrosion)
+  if (!glowing) {
+    ctx.fillStyle = 'rgba(0,50,25,0.3)';
+    ctx.beginPath(); ctx.arc( 3, 2,   2.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-5, 8,   1.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc( 7,-6,   1.2, 0, Math.PI * 2); ctx.fill();
+    // Rust/mineral streak
+    ctx.fillStyle = 'rgba(60,80,40,0.2)';
+    ctx.beginPath();
+    ctx.moveTo(4, -14); ctx.lineTo(5, 0); ctx.lineTo(3, 0); ctx.lineTo(2, -14);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // Opening mouth rim (darkened interior)
+  ctx.fillStyle = glowing ? 'rgba(255,180,60,0.6)' : 'rgba(0,0,0,0.7)';
+  ctx.beginPath();
+  ctx.ellipse(0, -16, 9, 3.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mouth rim highlight
+  ctx.strokeStyle = p.light + '88';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.arc(0, -16, 9, Math.PI, 0, false);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── Drawing: rusted iron arm ──────────────────────────────────────────────────
+function drawArm() {
+  const armLen = RING_R - 10;
+  const ax = CX + armLen * Math.cos(angle);
+  const ay = CY + armLen * Math.sin(angle);
+
+  ctx.save();
+
+  // Drop shadow
+  ctx.shadowColor    = 'rgba(0,0,0,0.7)';
+  ctx.shadowBlur     = 8;
+  ctx.shadowOffsetX  = 3;
+  ctx.shadowOffsetY  = 4;
+
+  // Main arm: rusted iron gradient
+  const lg = ctx.createLinearGradient(CX, CY, ax, ay);
+  lg.addColorStop(0,    '#2a1208');  // deep shadow at pivot
+  lg.addColorStop(0.15, '#6a2e10');  // dark rust
+  lg.addColorStop(0.45, '#a84c20');  // mid orange-rust
+  lg.addColorStop(0.7,  '#c87038');  // worn bright rust
+  lg.addColorStop(0.88, '#b86030');  // fading
+  lg.addColorStop(1,    '#8a4820');  // tip
+
+  ctx.strokeStyle = lg;
+  ctx.lineWidth   = 5.5;
+  ctx.lineCap     = 'round';
+  ctx.beginPath();
+  ctx.moveTo(CX, CY);
+  ctx.lineTo(ax, ay);
+  ctx.stroke();
+
+  // Worn texture groove along arm
+  ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+  const groove = ctx.createLinearGradient(CX, CY, ax, ay);
+  groove.addColorStop(0, 'rgba(0,0,0,0.0)');
+  groove.addColorStop(0.3, 'rgba(0,0,0,0.3)');
+  groove.addColorStop(0.7, 'rgba(0,0,0,0.2)');
+  groove.addColorStop(1, 'rgba(0,0,0,0.0)');
+  const perp = Math.atan2(ay - CY, ax - CX) + Math.PI / 2;
+  ctx.strokeStyle = groove;
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(CX + 2 * Math.cos(perp), CY + 2 * Math.sin(perp));
+  ctx.lineTo(ax + 2 * Math.cos(perp), ay + 2 * Math.sin(perp));
+  ctx.stroke();
+
+  // Rust fleck texture (small dots on arm)
+  ctx.fillStyle = 'rgba(200,80,20,0.2)';
+  // Fixed positions along arm (seeded)
+  const fleckPositions = [0.25, 0.42, 0.58, 0.75];
+  for (const t of fleckPositions) {
+    const fx = CX + t * (ax - CX);
+    const fy = CY + t * (ay - CY);
+    ctx.beginPath();
+    ctx.arc(fx + 2, fy - 1, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Tip: worn hammered knob
+  ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 5;
+  const tipG = ctx.createRadialGradient(ax - 2, ay - 2, 0, ax, ay, 7);
+  tipG.addColorStop(0,   '#d09050');
+  tipG.addColorStop(0.4, '#9a5828');
+  tipG.addColorStop(0.8, '#5a2e10');
+  tipG.addColorStop(1,   '#2a1206');
+  ctx.beginPath();
+  ctx.arc(ax, ay, 7, 0, Math.PI * 2);
+  ctx.fillStyle = tipG;
+  ctx.fill();
+
+  // Pivot hub: aged bronze casting
+  ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 12;
+  const pivG = ctx.createRadialGradient(CX - 3, CY - 3, 0, CX, CY, 14);
+  pivG.addColorStop(0,    '#d8a848');  // polished center
+  pivG.addColorStop(0.25, '#9a7230');
+  pivG.addColorStop(0.55, '#5a3e18');
+  pivG.addColorStop(0.8,  '#2e1e08');
+  pivG.addColorStop(1,    '#0e0a04');
+  ctx.beginPath();
+  ctx.arc(CX, CY, 13, 0, Math.PI * 2);
+  ctx.fillStyle = pivG;
+  ctx.fill();
+
+  // Pivot outer ring
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(CX, CY, 14, 0, Math.PI * 2);
+  ctx.strokeStyle = '#3a2810';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Pivot center rivet hole
+  ctx.beginPath();
+  ctx.arc(CX, CY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#0a0704';
+  ctx.fill();
+  ctx.strokeStyle = '#6a4820';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+function frame(ts) {
+  if (!lastTime) lastTime = ts;
+  const dt = Math.min((ts - lastTime) / 1000, 0.1);
+  lastTime = ts;
+
+  lastAngle = angle;
+  angle += Math.PI * 2 * (bpm / 60 / 4) * dt;
+  if (angle > 500 * Math.PI) angle -= 500 * Math.PI;
+
+  // Bell hit detection
+  for (const bell of bells) {
+    const ba = stepAngle(bell.step);
+    if (didPass(lastAngle, angle, ba)) {
+      if (!bell.hitAt || ts - bell.hitAt > 80) {
+        bell.hitAt = ts;
+        playCowbell(bell.pitch);
+      }
+    }
+  }
+
+  drawBg();
+  drawInnerDisk();
+  drawRing();
+  for (const bell of bells) drawBellAt(bell, ts);
+  drawArm();
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ── Interaction ───────────────────────────────────────────────────────────────
+function getStepAt(e) {
+  const r    = canvas.getBoundingClientRect();
+  const x    = (e.clientX - r.left)  * (canvas.width  / r.width)  - CX;
+  const y    = (e.clientY - r.top)   * (canvas.height / r.height) - CY;
+  const dist = Math.sqrt(x * x + y * y);
+  if (Math.abs(dist - RING_R) > SNAP_R) return null;
+  return angleToStep(Math.atan2(y, x));
+}
+
+canvas.addEventListener('click', e => {
+  ensureAudio();
+  const step = getStepAt(e);
+  if (step === null) return;
+  const idx = bells.findIndex(b => b.step === step);
+  if (idx >= 0) bells.splice(idx, 1);
+  else bells.push({ step, pitch: selectedPitch, hitAt: null });
+});
+
+canvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const step = getStepAt(e);
+  if (step === null) return;
+  const bell = bells.find(b => b.step === step);
+  if (bell) bell.pitch = (bell.pitch + 1) % PITCHES.length;
+});
+
+// ── UI controls ───────────────────────────────────────────────────────────────
+const pitchRow = document.getElementById('pitchRow');
+PITCHES.forEach((p, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'pitch-btn' + (i === selectedPitch ? ' sel' : '');
+  btn.textContent = p.label;
+  btn.style.background = `linear-gradient(180deg, ${p.color}30, ${p.dark}70)`;
+  btn.style.color = p.color;
+  btn.addEventListener('click', () => {
+    selectedPitch = i;
+    pitchRow.querySelectorAll('.pitch-btn').forEach((b, j) => b.classList.toggle('sel', j === i));
+  });
+  pitchRow.appendChild(btn);
+});
+
+const bpmRange = document.getElementById('bpmRange');
+const bpmVal   = document.getElementById('bpmVal');
+bpmRange.addEventListener('input', () => {
+  bpm = +bpmRange.value;
+  bpmVal.textContent = bpm;
+});
+
+document.getElementById('stepRow').addEventListener('click', e => {
+  const btn = e.target.closest('.step-btn');
+  if (!btn) return;
+  steps = +btn.dataset.n;
+  bells = [];
+  document.querySelectorAll('.step-btn').forEach(b => b.classList.toggle('sel', b === btn));
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => { bells = []; });
+</script>
+</body>
+</html>
